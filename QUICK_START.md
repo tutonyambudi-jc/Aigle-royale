@@ -62,11 +62,14 @@ Après avoir exécuté `npm run db:seed`, vous pouvez vous connecter avec :
    - Départ: `Abidjan`
    - Arrivée: `Yamoussoukro`
    - Date: Demain
+   - **Passagers: 2 Adultes, 1 Enfant** (teste le paiement groupé)
 2. Cliquer sur "Réserver" pour un trajet
-3. Sélectionner un siège
-4. Remplir les informations passager
+3. **Sélectionner 3 sièges** (un pour chaque passager)
+4. Remplir les informations pour chaque passager
 5. Choisir "Paiement en agence"
-6. ✅ Vérifier : Billet généré avec QR code
+6. ✅ Vérifier : **Page de paiement groupé** affiche le récapitulatif des 3 billets
+7. ✅ Vérifier : **Un seul montant total** pour tous les billets
+8. ✅ Vérifier : Billets générés avec QR codes individuels
 
 #### Test 3 : Tester le back-office admin
 1. Se connecter en tant qu'admin

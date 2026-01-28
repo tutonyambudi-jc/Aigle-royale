@@ -7,9 +7,11 @@ Plateforme web complète pour la réservation et la vente de billets de bus avec
 ### Module Client
 - Recherche de trajets (ville départ/arrivée, date)
 - **Recherche incluant les arrêts intermédiaires**
+- **Sélection multiple de passagers** (adultes, enfants, bébés, seniors)
 - Choix de siège interactif sur plan du bus
 - **Sélection du type de passager** (Adulte, Enfant, Bébé, Senior, Handicapé)
 - **Tarification automatique selon l'âge et le statut**
+- **Paiement groupé pour plusieurs billets** (économie sur les frais de commission)
 - Réservation et paiement (Mobile Money, Carte bancaire, Paiement en agence)
 - Génération de billets électroniques avec QR code
 - Historique des voyages

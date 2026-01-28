@@ -22,9 +22,9 @@ Authentification NextAuth (login/logout)
 ## Réservations
 
 ### POST `/api/bookings`
-Créer une nouvelle réservation
+Créer une ou plusieurs réservations (avec regroupement automatique)
 
-**Body:**
+**Body pour un seul passager:**
 ```json
 {
   "tripId": "string",
@@ -40,6 +40,26 @@ Créer une nouvelle réservation
 }
 ```
 
+**Body pour plusieurs passagers:**
+```json
+{
+  "tripId": "string",
+  "passengers": [
+    {
+      "seatId": "string",
+      "passengerName": "string",
+      "passengerPhone": "string (optionnel)",
+      "passengerEmail": "string (optionnel)",
+      "passengerType": "ADULT" | "CHILD" | "INFANT" | "SENIOR" | "DISABLED",
+      "passengerAge": "number",
+      "hasDisability": "boolean (optionnel)",
+      "boardingStopId": "string (optionnel)",
+      "alightingStopId": "string (optionnel)"
+    }
+  ]
+}
+```
+
 **Calcul automatique des prix:**
 - Le système récupère la règle de tarification selon `passengerType`
 - `basePrice` = prix du trajet
@@ -49,13 +69,18 @@ Créer une nouvelle réservation
 **Response:**
 ```json
 {
-  "bookingId": "string",
-  "ticketNumber": "string"
+  "bookingGroupId": "string (nouveau - ID du groupe de réservations)",
+  "bookingId": "string (ID de la première réservation)",
+  "ticketNumber": "string (Numéro du premier billet)",
+  "bookingIds": ["string", "string", ...],
+  "ticketNumbers": ["string", "string", ...]
 }
 ```
 
+**Note importante:** Lors de réservations multiples, toutes les réservations sont regroupées dans un `BookingGroup` unique. Cela permet un **paiement unique** pour tous les billets, réduisant ainsi les frais de commission.
+
 ### POST `/api/bookings/[id]/payment`
-Effectuer le paiement d'une réservation
+Effectuer le paiement d'une réservation individuelle (ancien système)
 
 **Body:**
 ```json
@@ -63,6 +88,38 @@ Effectuer le paiement d'une réservation
   "method": "MOBILE_MONEY" | "CARD" | "CASH"
 }
 ```
+
+## Groupes de Réservations (Nouveau)
+
+### POST `/api/booking-groups/[id]/payment`
+Effectuer le paiement groupé pour plusieurs billets
+
+**Body:**
+```json
+{
+  "method": "MOBILE_MONEY" | "CARD" | "CASH"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "payment": {
+    "id": "string",
+    "amount": "number (montant total)",
+    "method": "string",
+    "status": "PAID" | "PENDING",
+    "paidAt": "datetime | null"
+  }
+}
+```
+
+**Avantages du paiement groupé:**
+- ✅ Un seul paiement pour tous les billets
+- ✅ Une seule commission prélevée
+- ✅ Récapitulatif complet de tous les passagers
+- ✅ Gestion simplifiée pour les familles/groupes
 
 ## Trajets
 
