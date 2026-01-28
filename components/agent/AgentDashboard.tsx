@@ -90,7 +90,7 @@ interface AgentDashboardProps {
   initialStats: AgentStats
   agentId: string
   agentName: string
-  displayCurrency: 'XOF' | 'USD'
+  displayCurrency: 'FC' | 'USD'
 }
 
 export function AgentDashboard({ initialStats, agentId, agentName, displayCurrency }: AgentDashboardProps) {

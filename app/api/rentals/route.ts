@@ -40,10 +40,10 @@ export async function POST(request: Request) {
         }
 
         // Calculer le prix de base
-        const dailyRate = 150000 // XOF
-        const halfDayRate = 80000 // XOF
-        const pricePerKm = 500 // XOF
-        const vipSupplement = 50000 // XOF
+        const dailyRate = 150000 // FC
+        const halfDayRate = 80000 // FC
+        const pricePerKm = 500 // FC
+        const vipSupplement = 50000 // FC
 
         let basePrice = rentalType === 'FULL_DAY' ? dailyRate : halfDayRate
 

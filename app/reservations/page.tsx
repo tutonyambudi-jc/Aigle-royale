@@ -46,7 +46,7 @@ export default async function ReservationsPage({
   }
 
   const cookieStore = await cookies()
-  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'XOF'
+  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'FC'
 
   const status = (sp?.status || 'ALL').toUpperCase() as StatusFilter
   const where: any = { userId: session.user.id }

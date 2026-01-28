@@ -102,7 +102,7 @@ export function SuperAgentDashboard({
 }: {
   initialStats: SuperAgentStats
   initialBookings: Booking[]
-  displayCurrency: 'XOF' | 'USD'
+  displayCurrency: 'FC' | 'USD'
   agentInfo?: { firstName: string; lastName: string; passportPhotoUrl: string | null }
   weeklyStats: { name: string; tickets: number; freight: number }[]
 }) {

@@ -48,7 +48,7 @@ export default async function BookRoundTripPage({
     const sp = await searchParams
     const { outboundId, returnId } = sp
     const cookieStore = await cookies()
-    const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'XOF'
+    const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'FC'
     const session = await getServerSession(authOptions)
 
     if (!session) {

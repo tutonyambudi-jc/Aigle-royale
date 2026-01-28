@@ -13,24 +13,24 @@ function getCookie(name: string): string | null {
 function getPreferredCurrency(): DisplayCurrency {
   try {
     const ls = window.localStorage.getItem('ar_currency')
-    if (ls === 'USD' || ls === 'XOF') return ls
-  } catch {}
+    if (ls === 'USD' || ls === 'FC') return ls
+  } catch { }
   const c = getCookie('ar_currency')
-  if (c === 'USD' || c === 'XOF') return c
-  return 'XOF'
+  if (c === 'USD' || c === 'FC') return c
+  return 'FC'
 }
 
 function persistCurrency(cur: DisplayCurrency) {
   try {
     window.localStorage.setItem('ar_currency', cur)
-  } catch {}
+  } catch { }
   // Cookie non HttpOnly pour être lisible côté client; permet aussi de persister entre pages
   document.cookie = `ar_currency=${encodeURIComponent(cur)}; Path=/; Max-Age=31536000; SameSite=Lax`
 }
 
 export function CurrencySelector() {
   const router = useRouter()
-  const [currency, setCurrency] = useState<DisplayCurrency>('XOF')
+  const [currency, setCurrency] = useState<DisplayCurrency>('FC')
 
   useEffect(() => {
     setCurrency(getPreferredCurrency())
@@ -40,7 +40,7 @@ export function CurrencySelector() {
     <select
       value={currency}
       onChange={(e) => {
-        const next = (e.target.value === 'USD' ? 'USD' : 'XOF') as DisplayCurrency
+        const next = (e.target.value === 'USD' ? 'USD' : 'FC') as DisplayCurrency
         setCurrency(next)
         persistCurrency(next)
         // Assure la mise à jour de toutes les pages (server + client)
@@ -51,7 +51,7 @@ export function CurrencySelector() {
       aria-label="Sélecteur de monnaie"
       title="Monnaie"
     >
-      <option value="XOF">FC</option>
+      <option value="FC">FC</option>
       <option value="USD">USD</option>
     </select>
   )

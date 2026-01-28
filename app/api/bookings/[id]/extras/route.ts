@@ -4,8 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { calcBaggageExtrasXof } from '@/lib/baggage'
 
-const WIFI_PASS_PRICE_XOF = (() => {
-  const raw = process.env.NEXT_PUBLIC_WIFI_PASS_PRICE_XOF
+const WIFI_PASS_PRICE_FC = (() => {
+  const raw = process.env.NEXT_PUBLIC_WIFI_PASS_PRICE_FC
   const n = raw ? Number(raw) : NaN
   return Number.isFinite(n) && n >= 0 ? n : 1000
 })()
@@ -59,7 +59,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       extraPieces: extraBaggagePieces,
       overweightKg: extraBaggageOverweightKg,
     })
-    const extrasTotal = mealPrice + (wifiPass ? WIFI_PASS_PRICE_XOF : 0) + baggageExtras
+    const extrasTotal = mealPrice + (wifiPass ? WIFI_PASS_PRICE_FC : 0) + baggageExtras
     const totalPrice = booking.trip.price + extrasTotal
 
     const updated = await prisma.booking.update({
@@ -83,7 +83,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       },
     })
 
-    return NextResponse.json({ booking: updated, wifiPrice: WIFI_PASS_PRICE_XOF })
+    return NextResponse.json({ booking: updated, wifiPrice: WIFI_PASS_PRICE_FC })
   } catch (error) {
     console.error('Booking extras update error:', error)
     return NextResponse.json({ error: `Erreur technique (${error instanceof Error ? error.message : 'Inconnue'})` }, { status: 500 })

@@ -58,11 +58,11 @@ export default async function OffersPage() {
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="font-bold text-gray-900">
-                                            {offer.discountType === 'PERCENTAGE' ? `-${offer.discountValue}%` : `-${formatCurrency(offer.discountValue, 'XOF')}`}
+                                            {offer.discountType === 'PERCENTAGE' ? `-${offer.discountValue}%` : `-${formatCurrency(offer.discountValue, 'FC')}`}
                                         </div>
                                         {offer.minAmount && (
                                             <div className="text-xs text-gray-500 mt-1">
-                                                Min. {formatCurrency(offer.minAmount, 'XOF')}
+                                                Min. {formatCurrency(offer.minAmount, 'FC')}
                                             </div>
                                         )}
                                     </td>

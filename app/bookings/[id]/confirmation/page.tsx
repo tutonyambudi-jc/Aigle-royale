@@ -67,7 +67,7 @@ export default async function ConfirmationPage({
   }
 
   const cookieStore = await cookies()
-  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'XOF'
+  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'FC'
   const backUrl =
     session.user.role === 'AGENT'
       ? '/agent'

@@ -110,7 +110,7 @@ Ouvrir [http://localhost:3000](http://localhost:3000)
    - Destinataire : Nom, Téléphone
    - Poids : `5` kg
    - Type : `Documents`
-   - Valeur : `10000` XOF
+   - Valeur : `10000` FC
 5. Cliquer sur "Créer la commande"
 6. ✅ Vérifier : Affichage du code de suivi
 
@@ -188,7 +188,7 @@ Ouvrir [http://localhost:3000](http://localhost:3000)
 3. Créer un trajet :
    - Sélectionner le bus et la route
    - Date/heure de départ
-   - Prix : `6000` XOF
+   - Prix : `6000` FC
 4. ✅ Vérifier : Le trajet apparaît dans les résultats de recherche
 
 #### Test 18 : Gestion des utilisateurs

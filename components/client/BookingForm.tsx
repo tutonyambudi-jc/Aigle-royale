@@ -44,7 +44,7 @@ interface BookingFormProps {
   } | null
 }
 
-export function BookingForm({ trip, availableSeats, displayCurrency = 'XOF', user }: BookingFormProps) {
+export function BookingForm({ trip, availableSeats, displayCurrency = 'FC', user }: BookingFormProps) {
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [selectedSeat, setSelectedSeat] = useState<string | null>(null)
@@ -214,7 +214,7 @@ export function BookingForm({ trip, availableSeats, displayCurrency = 'XOF', use
                 onSeatSelect={setSelectedSeat}
               />
             </div>
-            
+
             {/* Legend on the right */}
             <div className="w-64 flex-shrink-0">
               <div className="bg-white/40 backdrop-blur-sm rounded-2xl p-4 border border-slate-200/60 shadow-sm sticky top-20">
@@ -237,7 +237,7 @@ export function BookingForm({ trip, availableSeats, displayCurrency = 'XOF', use
                     <span className="text-sm text-slate-600">Choisi</span>
                   </div>
                 </div>
-                
+
                 {/* Seats remaining info */}
                 <div className="mt-6 pt-4 border-t border-slate-200">
                   <div className={`px-4 py-3 rounded-xl text-center font-black shadow-sm ${availableSeats.length <= 5

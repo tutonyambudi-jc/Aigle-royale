@@ -84,7 +84,7 @@ export default async function MyRentalsPage() {
                                         <div className="space-y-1">
                                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Prix Total</p>
                                             <p className="text-2xl font-black text-primary-600">
-                                                {rental.finalPrice || rental.basePrice || 0} <span className="text-sm">XOF</span>
+                                                {rental.finalPrice || rental.basePrice || 0} <span className="text-sm">FC</span>
                                             </p>
                                         </div>
 

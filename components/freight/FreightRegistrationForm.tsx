@@ -522,7 +522,7 @@ export function FreightRegistrationForm({ onSuccess }: FreightRegistrationFormPr
                             onChange={(e) => setFormData({ ...formData, value: e.target.value })}
                             className="w-full px-5 py-4 bg-gray-50 border-2 border-transparent focus:bg-white focus:border-primary-500 rounded-2xl transition-all font-bold text-gray-900"
                           />
-                          <span className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold">XOF</span>
+                          <span className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 font-bold">FC</span>
                         </div>
                       </div>
                     </div>
@@ -568,7 +568,7 @@ export function FreightRegistrationForm({ onSuccess }: FreightRegistrationFormPr
                         </div>
                         <div className="text-right">
                           <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Valeur</div>
-                          <div className="text-2xl font-black">{formData.value ? `${formData.value} XOF` : '—'}</div>
+                          <div className="text-2xl font-black">{formData.value ? `${formData.value} FC` : '—'}</div>
                         </div>
                       </div>
 
@@ -576,7 +576,7 @@ export function FreightRegistrationForm({ onSuccess }: FreightRegistrationFormPr
                         <div className="flex justify-between items-center bg-white/5 p-4 rounded-2xl">
                           <span className="text-sm font-bold text-white/60">Prix Total estimé</span>
                           <span className="text-3xl font-black text-primary-500">
-                            {calculateTotalPrice().toLocaleString()} XOF
+                            {calculateTotalPrice().toLocaleString()} FC
                           </span>
                         </div>
                       </div>

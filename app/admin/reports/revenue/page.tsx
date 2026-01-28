@@ -83,7 +83,7 @@ async function getGraphData() {
 
 export default async function RevenueReportPage() {
     const cookieStore = await cookies()
-    const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'XOF'
+    const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'FC'
     const [stats, graphData] = await Promise.all([getFinancialStats(), getGraphData()])
 
     const statCards = [

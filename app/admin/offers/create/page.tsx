@@ -90,7 +90,7 @@ export default function CreateOfferPage() {
                                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                                 >
                                     <option value="PERCENTAGE">Pourcentage (%)</option>
-                                    <option value="FIXED_AMOUNT">Montant Fixe (XOF)</option>
+                                    <option value="FIXED_AMOUNT">Montant Fixe (FC)</option>
                                 </select>
                             </div>
                             <div>

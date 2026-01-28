@@ -148,7 +148,7 @@ export default async function SearchPage({
   }
 
   const cookieStore = await cookies()
-  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'XOF'
+  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'FC'
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -242,7 +242,7 @@ export default async function SearchPage({
                     if (t.promotionPercentage) return t.price * (1 - t.promotionPercentage / 100);
                   }
                   return t.price;
-                })).toLocaleString()} <span className="text-lg">XOF</span>
+                })).toLocaleString()} <span className="text-lg">FC</span>
               </div>
             </div>
             <div className="bg-white rounded-2xl p-5 shadow-lg border border-gray-100">

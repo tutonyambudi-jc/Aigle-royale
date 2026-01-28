@@ -79,7 +79,7 @@ export default async function AgentDashboardPage() {
   }
 
   const cookieStore = await cookies()
-  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'XOF'
+  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'FC'
   const stats = await getAgentStats(session.user.id)
 
   return (

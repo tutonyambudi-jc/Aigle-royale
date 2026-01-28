@@ -81,7 +81,7 @@ async function getFreightStats(userId?: string, role?: string) {
 export default async function FreightManagePage() {
   const session = await getServerSession(authOptions)
   const cookieStore = await cookies()
-  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'XOF'
+  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'FC'
 
   if (!session) {
     redirect('/auth/login')

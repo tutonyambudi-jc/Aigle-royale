@@ -12,7 +12,7 @@ interface PageProps {
 export default async function AdminBookingsPage({ searchParams }: PageProps) {
     const sp = await searchParams
     const cookieStore = await cookies()
-    const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'XOF'
+    const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'FC'
 
     const page = Number(sp.page) || 1
     const limit = Number(sp.limit) || 20

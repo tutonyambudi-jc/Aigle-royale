@@ -171,7 +171,7 @@ export function RentalManagement() {
                                         {getStatusBadge(rental.status)}
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="font-black text-gray-900">{rental.finalPrice || rental.basePrice || 0} XOF</div>
+                                        <div className="font-black text-gray-900">{rental.finalPrice || rental.basePrice || 0} FC</div>
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <button
@@ -244,7 +244,7 @@ export function RentalManagement() {
                                         </select>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Prix Final (XOF)</label>
+                                        <label className="text-xs font-black text-gray-500 uppercase tracking-widest ml-1">Prix Final (FC)</label>
                                         <input
                                             type="number"
                                             className="w-full px-4 py-3 bg-white border-2 border-gray-100 rounded-2xl focus:ring-4 focus:ring-primary-100 focus:border-primary-500 transition-all text-sm font-semibold"

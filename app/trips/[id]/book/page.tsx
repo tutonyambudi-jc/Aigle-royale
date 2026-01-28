@@ -54,7 +54,7 @@ export default async function BookTripPage({
 
   // On récupère la devise
   const cookieStore = await cookies()
-  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'XOF'
+  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'FC'
 
   let user = null
   if (session?.user?.id) {

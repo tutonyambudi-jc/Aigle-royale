@@ -40,8 +40,8 @@ export async function POST(request: Request) {
     const hashedPassword = await hash(password, 10)
 
     // Parrainage (optionnel)
-    const REFERRER_BONUS_XOF = 500
-    const NEW_USER_BONUS_XOF = 500
+    const REFERRER_BONUS_FC = 500
+    const NEW_USER_BONUS_FC = 500
 
     const created = await prisma.$transaction(async (tx) => {
       let referrerId: string | undefined
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
           role: 'CLIENT',
           referralCode: newUserReferralCode,
           referredById: referrerId ?? null,
-          referralCredits: referralCodeInput ? NEW_USER_BONUS_XOF : 0,
+          referralCredits: referralCodeInput ? NEW_USER_BONUS_FC : 0,
         },
         select: { id: true },
       })
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
         await tx.user.update({
           where: { id: referrerId },
           data: {
-            referralCredits: { increment: REFERRER_BONUS_XOF },
+            referralCredits: { increment: REFERRER_BONUS_FC },
             referralCount: { increment: 1 },
           },
         })

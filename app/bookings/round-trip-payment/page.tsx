@@ -33,7 +33,7 @@ export default async function RoundTripPaymentPage({
     const sp = await searchParams
     const { outboundId, returnId } = sp
     const cookieStore = await cookies()
-    const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'XOF'
+    const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'FC'
 
     if (!outboundId || !returnId) {
         redirect('/')

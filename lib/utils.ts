@@ -17,10 +17,10 @@ export function generateTrackingCode(): string {
   return `FR-${timestamp}-${random}`
 }
 
-export type DisplayCurrency = 'XOF' | 'USD'
+export type DisplayCurrency = 'FC' | 'USD'
 
 function getUsdXofRate(): number {
-  const raw = process.env.NEXT_PUBLIC_USD_XOF_RATE
+  const raw = process.env.NEXT_PUBLIC_USD_FC_RATE
   const n = raw ? Number(raw) : NaN
   return Number.isFinite(n) && n > 0 ? n : 600
 }
@@ -32,14 +32,14 @@ function readCookie(name: string): string | null {
 }
 
 function getClientPreferredCurrency(): DisplayCurrency {
-  if (typeof window === 'undefined') return 'XOF'
+  if (typeof window === 'undefined') return 'FC'
   try {
     const ls = window.localStorage.getItem('ar_currency')
-    if (ls === 'USD' || ls === 'XOF') return ls
+    if (ls === 'USD' || ls === 'FC') return ls
   } catch { }
   const c = readCookie('ar_currency')
-  if (c === 'USD' || c === 'XOF') return c
-  return 'XOF'
+  if (c === 'USD' || c === 'FC') return c
+  return 'FC'
 }
 
 function getServerPreferredCurrency(): DisplayCurrency {
@@ -49,15 +49,15 @@ function getServerPreferredCurrency(): DisplayCurrency {
     const req = (0, eval)('require') as any
     const mod = req('next/headers') as any
     const c = mod?.cookies?.()?.get?.('ar_currency')?.value
-    if (c === 'USD' || c === 'XOF') return c
+    if (c === 'USD' || c === 'FC') return c
   } catch { }
-  return 'XOF'
+  return 'FC'
 }
 
 /**
- * Format un montant stocké en XOF (FC) en XOF ou USD selon la préférence.
- * - Base: XOF (FC)
- * - Conversion: USD = XOF / NEXT_PUBLIC_USD_XOF_RATE (par défaut 600)
+ * Format un montant stocké en FC (FC) en FC ou USD selon la préférence.
+ * - Base: FC (FC)
+ * - Conversion: USD = FC / NEXT_PUBLIC_USD_FC_RATE (par défaut 600)
  */
 export function formatCurrency(amountXof: number, currency?: DisplayCurrency): string {
   const cur: DisplayCurrency =
@@ -73,17 +73,17 @@ export function formatCurrency(amountXof: number, currency?: DisplayCurrency): s
     }).format(usd)
   }
 
-  // On veut afficher "FC" (pas "XOF" ni "CFA") partout côté UI.
+  // On veut afficher "FC" (pas "FC" ni "CFA") partout côté UI.
   const formatted = new Intl.NumberFormat('fr-FR', {
     style: 'currency',
-    currency: 'XOF',
+    currency: 'FC',
     maximumFractionDigits: 0,
   }).format(amountXof)
 
-  // Remplacer les variantes possibles générées par Intl (XOF, CFA, F CFA, FCFA, etc.)
+  // Remplacer les variantes possibles générées par Intl (FC, CFA, F CFA, FCFA, etc.)
   // On utilise une approche plus large pour s'assurer que "F\u202fCFA" (avec espace insécable) est aussi capturé
   return formatted
-    .replace(/[F\s]*CFA|XOF/g, 'FC')
+    .replace(/[F\s]*CFA|FC/g, 'FC')
     .trim()
 }
 

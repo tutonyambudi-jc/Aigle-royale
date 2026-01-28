@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function CommissionsPage() {
     const cookieStore = await cookies()
-    const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'XOF'
+    const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'FC'
 
     const [commissions, stats] = await Promise.all([
         prisma.commission.findMany({

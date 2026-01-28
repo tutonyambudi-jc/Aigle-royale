@@ -9,8 +9,8 @@ import { type DisplayCurrency } from '@/lib/utils'
 import { BookingExtrasForm } from '@/components/reservations/BookingExtrasForm'
 import Link from 'next/link'
 
-const WIFI_PASS_PRICE_XOF = (() => {
-  const raw = process.env.NEXT_PUBLIC_WIFI_PASS_PRICE_XOF
+const WIFI_PASS_PRICE_FC = (() => {
+  const raw = process.env.NEXT_PUBLIC_WIFI_PASS_PRICE_FC
   const n = raw ? Number(raw) : NaN
   return Number.isFinite(n) && n >= 0 ? n : 1000
 })()
@@ -68,7 +68,7 @@ export default async function BookingExtrasPage({ params }: { params: Promise<{ 
   })
 
   const cookieStore = await cookies()
-  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'XOF'
+  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'FC'
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -91,7 +91,7 @@ export default async function BookingExtrasPage({ params }: { params: Promise<{ 
           initialExtraBaggageOverweightKg={booking.extraBaggageOverweightKg || 0}
           meals={meals}
           currency={currency}
-          wifiPriceXof={WIFI_PASS_PRICE_XOF}
+          wifiPriceXof={WIFI_PASS_PRICE_FC}
         />
 
         <div className="mt-6 flex justify-end">

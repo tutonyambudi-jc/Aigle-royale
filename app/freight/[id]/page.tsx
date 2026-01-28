@@ -35,7 +35,7 @@ export default async function FreightOrderPage({
   const session = await getServerSession(authOptions)
   const order = await getFreightOrder(p.id)
   const cookieStore = await cookies()
-  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'XOF'
+  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'FC'
 
   if (!order) {
     return (
@@ -130,8 +130,8 @@ export default async function FreightOrderPage({
                 <div>
                   <div className="text-sm text-gray-600 mb-1">Statut</div>
                   <span className={`px-2 py-1 rounded text-xs font-semibold ${order.status === 'DELIVERED' ? 'bg-green-100 text-green-800' :
-                      order.status === 'IN_TRANSIT' ? 'bg-blue-100 text-blue-800' :
-                        'bg-gray-100 text-gray-800'
+                    order.status === 'IN_TRANSIT' ? 'bg-blue-100 text-blue-800' :
+                      'bg-gray-100 text-gray-800'
                     }`}>
                     {order.status === 'DELIVERED' ? 'Livré' :
                       order.status === 'IN_TRANSIT' ? 'En transit' :

@@ -303,7 +303,7 @@ export function TripSearchResults({
   trips,
   returnTrips,
   isRoundTrip,
-  displayCurrency = 'XOF',
+  displayCurrency = 'FC',
   outboundAvailability,
   returnAvailability
 }: TripSearchResultsProps) {
@@ -594,7 +594,7 @@ export function TripSearchResults({
                       {dailyTrips.length} car(s)
                     </p>
                     <p className={`text-sm font-black mt-1 ${hasPromo ? 'text-rose-600' : 'text-primary-600'}`}>
-                      Dès {lowestPrice?.toLocaleString()} XOF
+                      Dès {lowestPrice?.toLocaleString()} FC
                     </p>
                     <ul className="mt-2 space-y-1">
                       {dailyTrips.map((trip: any) => (
@@ -615,7 +615,7 @@ export function TripSearchResults({
 
       {/* Display Lowest Price */}
       <div className="text-sm font-bold text-gray-600">
-        Prix le plus bas : <span className="text-primary-600">{Math.min(...trips.map((trip) => trip.price))} XOF</span>
+        Prix le plus bas : <span className="text-primary-600">{Math.min(...trips.map((trip) => trip.price))} FC</span>
       </div>
     </div>
   )

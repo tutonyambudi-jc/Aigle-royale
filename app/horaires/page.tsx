@@ -13,7 +13,7 @@ export default async function HorairesPage({
 }) {
   const sp = await searchParams
   const cookieStore = await cookies()
-  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'XOF'
+  const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'FC'
 
   const days = Math.min(30, Math.max(1, Number(sp?.days || 14)))
   const from = sp?.from ? new Date(sp.from) : new Date()

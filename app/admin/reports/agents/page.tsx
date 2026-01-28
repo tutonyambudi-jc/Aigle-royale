@@ -48,7 +48,7 @@ async function getAgentStats() {
 
 export default async function AgentPerformancePage() {
     const cookieStore = await cookies()
-    const currency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'XOF'
+    const currency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'FC'
     const agentStats = await getAgentStats()
 
     const totalAgentRevenue = agentStats.reduce((acc, curr) => acc + curr.totalRevenue, 0)

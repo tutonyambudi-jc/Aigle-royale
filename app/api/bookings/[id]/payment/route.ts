@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma'
 
 
 function calculatePointsFromAmount(amountXof: number): number {
-  // Règle simple: 1 point par tranche de 1000 XOF payés
+  // Règle simple: 1 point par tranche de 1000 FC payés
   return Math.max(0, Math.floor(amountXof / 1000))
 }
 
