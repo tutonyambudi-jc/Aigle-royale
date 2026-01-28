@@ -330,55 +330,115 @@ export function RoundTripBookingForm({
                     <div className="space-y-8">
                         <h3 className="text-xl font-bold text-gray-900">Sélection des sièges</h3>
 
-                        {/* Outbound Seat */}
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between mb-4 gap-2">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
-                                        <svg className="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                        </svg>
-                                    </div>
-                                    <span className="font-bold text-gray-900">Siège ALLER: {outboundTrip.route.origin} → {outboundTrip.route.destination}</span>
-                                </div>
-                                <div className={`px-4 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase shadow-sm ${outboundSeats.length <= 5 ? 'bg-rose-500 text-white animate-pulse' : 'bg-primary-50 text-primary-700'}`}>
-                                    {outboundSeats.length} restants
-                                </div>
-                            </div>
 
-                            <div className="max-w-sm mx-auto">
-                                <SeatMap
-                                    seats={outboundSeats}
-                                    selectedSeat={selectedOutboundSeat}
-                                    onSeatSelect={setSelectedOutboundSeat}
-                                />
-                            </div>
-                        </div>
+                                                {/* Outbound Seat */}
+                                                <div className="space-y-4">
+                                                    <div className="flex gap-8 items-start">
+                                                        {/* Bus on the left */}
+                                                        <div className="flex-1">
+                                                            <div className="flex items-center gap-2 mb-4">
+                                                                <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
+                                                                    <svg className="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                                                    </svg>
+                                                                </div>
+                                                                <span className="font-bold text-gray-900">Siège ALLER: {outboundTrip.route.origin} → {outboundTrip.route.destination}</span>
+                                                            </div>
+                                                            <SeatMap
+                                                                seats={outboundSeats}
+                                                                selectedSeat={selectedOutboundSeat}
+                                                                onSeatSelect={setSelectedOutboundSeat}
+                                                            />
+                                                        </div>
+                                                        {/* Legend on the right */}
+                                                        <div className="w-64 flex-shrink-0">
+                                                            <div className="bg-white/40 backdrop-blur-sm rounded-2xl p-4 border border-slate-200/60 shadow-sm sticky top-20">
+                                                                <div className="space-y-4">
+                                                                    <h4 className="font-semibold text-gray-900 mb-4">Légende</h4>
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-5 h-5 bg-white border border-slate-200 rounded-lg shadow-sm flex-shrink-0"></div>
+                                                                        <span className="text-sm text-slate-600">Libre</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-5 h-5 bg-gradient-to-br from-amber-400 to-amber-500 rounded-lg shadow-sm flex-shrink-0"></div>
+                                                                        <span className="text-sm text-slate-600">VIP</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-5 h-5 bg-slate-200 rounded-lg border-transparent opacity-40 flex-shrink-0"></div>
+                                                                        <span className="text-sm text-slate-600">Occupé</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-5 h-5 bg-primary-600 rounded-lg shadow-lg ring-2 ring-primary-100 flex-shrink-0"></div>
+                                                                        <span className="text-sm text-slate-600">Choisi</span>
+                                                                    </div>
+                                                                </div>
+                                                                {/* Seats remaining info */}
+                                                                <div className="mt-6 pt-4 border-t border-slate-200">
+                                                                    <div className={`px-4 py-3 rounded-xl text-center font-black shadow-sm ${outboundSeats.length <= 5
+                                                                        ? 'bg-rose-500 text-white animate-pulse'
+                                                                        : 'bg-primary-50 text-primary-700'}`}>
+                                                                        {outboundSeats.length} sièges restants
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                        {/* Return Seat */}
-                        <div className="space-y-4">
-                            <div className="flex items-center justify-between mb-4 gap-2">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                                        <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
-                                        </svg>
-                                    </div>
-                                    <span className="font-bold text-gray-900">Siège RETOUR: {returnTrip.route.origin} → {returnTrip.route.destination}</span>
-                                </div>
-                                <div className={`px-4 py-2 rounded-xl text-[10px] font-black tracking-widest uppercase shadow-sm ${returnSeats.length <= 5 ? 'bg-rose-500 text-white animate-pulse' : 'bg-green-50 text-green-700'}`}>
-                                    {returnSeats.length} restants
-                                </div>
-                            </div>
 
-                            <div className="max-w-sm mx-auto">
-                                <SeatMap
-                                    seats={returnSeats}
-                                    selectedSeat={selectedReturnSeat}
-                                    onSeatSelect={setSelectedReturnSeat}
-                                />
-                            </div>
-                        </div>
+                                                {/* Return Seat */}
+                                                <div className="space-y-4">
+                                                    <div className="flex gap-8 items-start">
+                                                        {/* Bus on the left */}
+                                                        <div className="flex-1">
+                                                            <div className="flex items-center gap-2 mb-4">
+                                                                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                                                                    <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+                                                                    </svg>
+                                                                </div>
+                                                                <span className="font-bold text-gray-900">Siège RETOUR: {returnTrip.route.origin} → {returnTrip.route.destination}</span>
+                                                            </div>
+                                                            <SeatMap
+                                                                seats={returnSeats}
+                                                                selectedSeat={selectedReturnSeat}
+                                                                onSeatSelect={setSelectedReturnSeat}
+                                                            />
+                                                        </div>
+                                                        {/* Legend on the right */}
+                                                        <div className="w-64 flex-shrink-0">
+                                                            <div className="bg-white/40 backdrop-blur-sm rounded-2xl p-4 border border-slate-200/60 shadow-sm sticky top-20">
+                                                                <div className="space-y-4">
+                                                                    <h4 className="font-semibold text-gray-900 mb-4">Légende</h4>
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-5 h-5 bg-white border border-slate-200 rounded-lg shadow-sm flex-shrink-0"></div>
+                                                                        <span className="text-sm text-slate-600">Libre</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-5 h-5 bg-gradient-to-br from-amber-400 to-amber-500 rounded-lg shadow-sm flex-shrink-0"></div>
+                                                                        <span className="text-sm text-slate-600">VIP</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-5 h-5 bg-slate-200 rounded-lg border-transparent opacity-40 flex-shrink-0"></div>
+                                                                        <span className="text-sm text-slate-600">Occupé</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-5 h-5 bg-primary-600 rounded-lg shadow-lg ring-2 ring-primary-100 flex-shrink-0"></div>
+                                                                        <span className="text-sm text-slate-600">Choisi</span>
+                                                                    </div>
+                                                                </div>
+                                                                {/* Seats remaining info */}
+                                                                <div className="mt-6 pt-4 border-t border-slate-200">
+                                                                    <div className={`px-4 py-3 rounded-xl text-center font-black shadow-sm ${returnSeats.length <= 5
+                                                                        ? 'bg-rose-500 text-white animate-pulse'
+                                                                        : 'bg-green-50 text-green-700'}`}>
+                                                                        {returnSeats.length} sièges restants
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
                         <div className="flex justify-between">
                             <button

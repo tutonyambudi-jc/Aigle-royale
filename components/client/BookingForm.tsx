@@ -204,19 +204,51 @@ export function BookingForm({ trip, availableSeats, displayCurrency = 'XOF', use
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Seat Selection */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Sélectionnez votre siège</h3>
-            <div className={`px-4 py-2 rounded-xl text-sm font-black shadow-sm ${availableSeats.length <= 5
-              ? 'bg-rose-500 text-white animate-pulse'
-              : 'bg-primary-50 text-primary-700'}`}>
-              {availableSeats.length} sièges restants
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Sélectionnez votre siège</h3>
+          <div className="flex gap-8 items-start">
+            {/* Bus on the left */}
+            <div className="flex-1">
+              <SeatMap
+                seats={availableSeats}
+                selectedSeat={selectedSeat}
+                onSeatSelect={setSelectedSeat}
+              />
+            </div>
+            
+            {/* Legend on the right */}
+            <div className="w-64 flex-shrink-0">
+              <div className="bg-white/40 backdrop-blur-sm rounded-2xl p-4 border border-slate-200/60 shadow-sm sticky top-20">
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-gray-900 mb-4">Légende</h4>
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 bg-white border border-slate-200 rounded-lg shadow-sm flex-shrink-0"></div>
+                    <span className="text-sm text-slate-600">Libre</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 bg-gradient-to-br from-amber-400 to-amber-500 rounded-lg shadow-sm flex-shrink-0"></div>
+                    <span className="text-sm text-slate-600">VIP</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 bg-slate-200 rounded-lg border-transparent opacity-40 flex-shrink-0"></div>
+                    <span className="text-sm text-slate-600">Occupé</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-5 bg-primary-600 rounded-lg shadow-lg ring-2 ring-primary-100 flex-shrink-0"></div>
+                    <span className="text-sm text-slate-600">Choisi</span>
+                  </div>
+                </div>
+                
+                {/* Seats remaining info */}
+                <div className="mt-6 pt-4 border-t border-slate-200">
+                  <div className={`px-4 py-3 rounded-xl text-center font-black shadow-sm ${availableSeats.length <= 5
+                    ? 'bg-rose-500 text-white animate-pulse'
+                    : 'bg-primary-50 text-primary-700'}`}>
+                    {availableSeats.length} sièges restants
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <SeatMap
-            seats={availableSeats}
-            selectedSeat={selectedSeat}
-            onSeatSelect={setSelectedSeat}
-          />
         </div>
 
         {/* Passenger Information */}

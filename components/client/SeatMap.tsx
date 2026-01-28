@@ -55,28 +55,6 @@ export function SeatMap({
 
   return (
     <div className="space-y-6">
-      {/* Légende élégante */}
-      <div className="bg-white/40 backdrop-blur-sm rounded-2xl p-4 border border-slate-200/60 shadow-sm">
-        <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
-          <div className="flex items-center gap-2.5">
-            <div className="w-5 h-5 bg-white border border-slate-200 rounded-lg shadow-sm"></div>
-            <span className="font-bold text-[10px] text-slate-500 uppercase tracking-widest">Libre</span>
-          </div>
-          <div className="flex items-center gap-2.5">
-            <div className="w-5 h-5 bg-gradient-to-br from-amber-400 to-amber-500 rounded-lg shadow-sm"></div>
-            <span className="font-bold text-[10px] text-slate-500 uppercase tracking-widest">VIP</span>
-          </div>
-          <div className="flex items-center gap-2.5">
-            <div className="w-5 h-5 bg-slate-200 rounded-lg border-transparent opacity-40"></div>
-            <span className="font-bold text-[10px] text-slate-500 uppercase tracking-widest">Occupé</span>
-          </div>
-          <div className="flex items-center gap-2.5">
-            <div className="w-5 h-5 bg-primary-600 rounded-lg shadow-lg ring-2 ring-primary-100"></div>
-            <span className="font-bold text-[10px] text-slate-500 uppercase tracking-widest">Choisi</span>
-          </div>
-        </div>
-      </div>
-
       {/* Realistic Bus Frame */}
       <div className="relative max-w-[320px] mx-auto group">
         <div className="absolute inset-0 bg-slate-900/5 rounded-[4rem] blur-2xl group-hover:bg-primary-600/5 transition-all duration-700"></div>
