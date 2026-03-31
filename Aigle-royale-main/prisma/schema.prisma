@@ -1,0 +1,758 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                          String                @id @default(uuid())
+  email                       String                @unique
+  password                    String
+  firstName                   String
+  lastName                    String
+  phone                       String?
+  role                        String                @default("CLIENT")
+  isActive                    Boolean               @default(true)
+  referralCode                String?               @unique
+  referredById                String?
+  referralCredits             Int                   @default(0)
+  referralCount               Int                   @default(0)
+  loyaltyPoints               Int                   @default(0)
+  loyaltyTier                 String                @default("BRONZE")
+  commissionRate              Float?                @default(10.0)
+  createdAt                   DateTime              @default(now())
+  updatedAt                   DateTime              @updatedAt
+  birthDate                   DateTime?
+  city                        String?
+  partnerCompanyId            String?
+  fingerprintUrl              String?
+  gender                      String?
+  passportOrIdNumber          String?
+  passportPhotoUrl            String?
+  advertisements              Advertisement[]
+  agencySales                 Booking[]             @relation("AgencySales")
+  agentSales                  Booking[]             @relation("AgentSales")
+  bookings                    Booking[]
+  drivenRentals               BusRental[]           @relation("RentalDriver")
+  rentals                     BusRental[]           @relation("RentalClient")
+  commissions                 Commission[]
+  createdDriverScheduleEvents DriverScheduleEvent[] @relation("DriverScheduleCreatedBy")
+  agentFreightSales           FreightOrder[]        @relation("AgentFreightSales")
+  freightOrders               FreightOrder[]
+  loyaltyTransactions         LoyaltyTransaction[]
+  manifestShares              ManifestShare[]       @relation("ManifestShareCreatedBy")
+  referredBy                  User?                 @relation("UserReferrals", fields: [referredById], references: [id])
+  referrals                   User[]                @relation("UserReferrals")
+  travelVouchers              TravelVoucher[]
+  createdTravelVouchers       TravelVoucher[]       @relation("TravelVoucherCreatedBy")
+  companyReviews              CompanyReview[]
+  appNotifications            AppNotification[]
+  sentNotificationCampaigns   NotificationCampaign[] @relation("NotificationCampaignCreatedBy")
+  notificationLogs            NotificationLog[]
+  supportComplaints           SupportComplaint[]
+  partnerCompany              BusCompany?           @relation(fields: [partnerCompanyId], references: [id])
+
+  @@map("users")
+}
+
+model Setting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
+
+model ManifestShare {
+  id          String    @id @default(uuid())
+  token       String    @unique
+  type        String
+  query       String
+  expiresAt   DateTime
+  createdById String
+  createdAt   DateTime  @default(now())
+  usedCount   Int       @default(0)
+  lastUsedAt  DateTime?
+  createdBy   User      @relation("ManifestShareCreatedBy", fields: [createdById], references: [id])
+
+  @@index([token])
+  @@map("manifest_shares")
+}
+
+model Bus {
+  id                   String                @id @default(uuid())
+  companyId            String?
+  plateNumber          String                @unique
+  name                 String
+  brand                String?
+  capacity             Int
+  seatLayout           String
+  amenities            String?
+  seatType             String                @default("STANDARD")
+  imageUrl             String?
+  isActive             Boolean               @default(true)
+  allowsIntermediateStops Boolean            @default(false)
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  rentals              BusRental[]
+  company              BusCompany?           @relation(fields: [companyId], references: [id])
+  scheduleEvents       DriverScheduleEvent[]
+  drivers              Driver[]
+  freightOrders        FreightOrder[]
+  seats                Seat[]
+  trips                Trip[]
+
+  @@map("buses")
+}
+
+model Driver {
+  id             String                @id @default(uuid())
+  firstName      String
+  lastName       String
+  phone          String?
+  licenseNumber  String?               @unique
+  busId          String?
+  isActive       Boolean               @default(true)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  scheduleEvents DriverScheduleEvent[]
+  bus            Bus?                  @relation(fields: [busId], references: [id])
+
+  @@map("drivers")
+}
+
+model DriverScheduleEvent {
+  id          String   @id @default(uuid())
+  driverId    String
+  type        String
+  startAt     DateTime
+  endAt       DateTime
+  busId       String?
+  notes       String?
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation("DriverScheduleCreatedBy", fields: [createdById], references: [id])
+  bus         Bus?     @relation(fields: [busId], references: [id])
+  driver      Driver   @relation(fields: [driverId], references: [id])
+
+  @@index([driverId, startAt])
+  @@index([driverId, endAt])
+  @@map("driver_schedule_events")
+}
+
+model BusCompany {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  buses     Bus[]
+  reviews   CompanyReview[]
+  partnerAdmins User[]
+
+  @@map("bus_companies")
+}
+
+model Route {
+  id                String      @id @default(uuid())
+  originCityId      String?
+  destinationCityId String?
+  origin            String
+  destination       String
+  distance          Float?
+  duration          Float?
+  isActive          Boolean     @default(true)
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  stops             RouteStop[]
+  destinationCity   City?       @relation("RouteDestinationCity", fields: [destinationCityId], references: [id])
+  originCity        City?       @relation("RouteOriginCity", fields: [originCityId], references: [id])
+  trips             Trip[]
+  travelVouchers    TravelVoucher[]
+
+  @@map("routes")
+}
+
+model Trip {
+  id             String         @id @default(uuid())
+  busId          String
+  routeId        String
+  departureTime  DateTime
+  arrivalTime    DateTime
+  price          Float
+  promoActive    Boolean        @default(false)
+  promoMode      String?
+  promoPrice     Float?
+  promoDays      String?
+  availableSeats Int
+  isActive              Boolean        @default(true)
+  boardingMinutesBefore Int            @default(30)
+  promotionPercentage   Int            @default(0)
+  createdAt             DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  bookings       Booking[]
+  freightOrders  FreightOrder[]
+  stopovers      TripStop[]
+  route          Route          @relation(fields: [routeId], references: [id])
+  bus            Bus            @relation(fields: [busId], references: [id])
+  travelVouchers TravelVoucher[]
+
+  @@map("trips")
+}
+
+model City {
+  id                String     @id @default(uuid())
+  name              String     @unique
+  isActive          Boolean    @default(true)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  stops             CityStop[]
+  destinationRoutes Route[]    @relation("RouteDestinationCity")
+  originRoutes      Route[]    @relation("RouteOriginCity")
+
+  @@map("cities")
+}
+
+model CityStop {
+  id                  String         @id @default(uuid())
+  cityId              String
+  name                String
+  address             String?
+  type                String         @default("BOTH")
+  isActive            Boolean        @default(true)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  city                City           @relation(fields: [cityId], references: [id])
+  freightDestinations FreightOrder[] @relation("FreightDestinationStop")
+  freightOrigins      FreightOrder[] @relation("FreightOriginStop")
+  routeStops          RouteStop[]
+  tripStops           TripStop[]
+  boardingBookings    Booking[]      @relation("BookingBoardingStop")
+  alightingBookings   Booking[]      @relation("BookingAlightingStop")
+
+  @@unique([cityId, name])
+  @@map("city_stops")
+}
+
+model RouteStop {
+  id        String   @id @default(uuid())
+  routeId   String
+  stopId    String
+  order     Int
+  role      String   @default("STOP")
+  notes     String?
+  createdAt DateTime @default(now())
+  stop      CityStop @relation(fields: [stopId], references: [id])
+  route     Route    @relation(fields: [routeId], references: [id])
+
+  @@unique([routeId, order])
+  @@map("route_stops")
+}
+
+model PassengerPricing {
+  id              String   @id @default(uuid())
+  passengerType   String   // ADULT, CHILD, INFANT, SENIOR, DISABLED
+  discountPercent Float    @default(0) // Percentage discount from adult price
+  minAge          Int?     // Minimum age for this category
+  maxAge          Int?     // Maximum age for this category
+  isActive        Boolean  @default(true)
+  description     String?
+  requiresDisabilityProof Boolean @default(false) // For DISABLED type
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([passengerType])
+  @@map("passenger_pricing")
+}
+
+model TripStop {
+  id            String    @id @default(uuid())
+  tripId        String
+  stopId        String
+  order         Int
+  arrivalTime   DateTime?
+  departureTime DateTime?
+  dwellMinutes  Int?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  stop          CityStop  @relation(fields: [stopId], references: [id])
+  trip          Trip      @relation(fields: [tripId], references: [id])
+
+  @@unique([tripId, order])
+  @@map("trip_stops")
+}
+
+model Seat {
+  id          String    @id @default(uuid())
+  busId       String
+  seatNumber  String
+  seatType    String    @default("STANDARD")
+  isAvailable Boolean   @default(true)
+  isHidden    Boolean   @default(false) // Pour cacher/afficher le siège dans l'admin
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  bookings    Booking[]
+  bus         Bus       @relation(fields: [busId], references: [id])
+
+  @@unique([busId, seatNumber])
+  @@map("seats")
+}
+
+model BookingGroup {
+  id              String    @id @default(uuid())
+  userId          String
+  totalAmount     Float
+  status          String    @default("PENDING") // PENDING, CONFIRMED, CANCELLED
+  paymentStatus   String    @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  bookings        Booking[]
+  payment         Payment?
+
+  @@map("booking_groups")
+}
+
+model Booking {
+  id                       String              @id @default(uuid())
+  bookingGroupId           String?
+  tripId                   String
+  userId                   String
+  seatId                   String
+  passengerName            String
+  passengerGender          String?
+  passengerType            String              @default("ADULT") // ADULT, CHILD, INFANT, SENIOR, DISABLED
+  passengerAge             Int? // Age du passager au moment de la réservation
+  hasDisability            Boolean             @default(false) // Si le passager a un handicap
+  disabilityProofUrl       String? // URL du justificatif de handicap
+  passengerAddress         String?
+  passengerPhone           String?
+  passengerEmail           String?
+  mealId                   String?
+  wifiPass                 Boolean             @default(false)
+  extraBaggagePieces       Int                 @default(0)
+  extraBaggageOverweightKg Float               @default(0)
+  extrasTotal              Float               @default(0)
+  status                   String              @default("PENDING")
+  qrCode                   String?             @unique
+  ticketNumber             String              @unique
+  totalPrice               Float               @default(0)
+  basePrice                Float               @default(0) // Prix de base avant réductions
+  discountAmount           Float               @default(0) // Montant de la réduction (enfant, etc.)
+  baggageCount             Int                 @default(0)
+  baggageWeight            Float               @default(0)
+  checkInNotes             String?
+  cancellationReason       String?
+  checkedInAt              DateTime?
+  boardingStopId           String?
+  alightingStopId          String?
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
+  agentId                  String?
+  agencyStaffId            String?
+  bookingGroup             BookingGroup?       @relation(fields: [bookingGroupId], references: [id])
+  agencyStaff              User?               @relation("AgencySales", fields: [agencyStaffId], references: [id])
+  agent                    User?               @relation("AgentSales", fields: [agentId], references: [id])
+  meal                     Meal?               @relation(fields: [mealId], references: [id])
+  seat                     Seat                @relation(fields: [seatId], references: [id])
+  user                     User                @relation(fields: [userId], references: [id])
+  trip                     Trip                @relation(fields: [tripId], references: [id])
+  boardingStop             CityStop?           @relation("BookingBoardingStop", fields: [boardingStopId], references: [id])
+  alightingStop            CityStop?           @relation("BookingAlightingStop", fields: [alightingStopId], references: [id])
+  loyaltyTransaction       LoyaltyTransaction?
+  payment                  Payment?
+  travelVoucher            TravelVoucher?
+
+  @@map("bookings")
+}
+
+model SeatSegmentAvailability {
+  id              String   @id @default(uuid())
+  tripId          String
+  seatId          String
+  fromStopOrder   Int
+  toStopOrder     Int
+  isAvailable     Boolean  @default(true)
+  bookingId       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([tripId, seatId, fromStopOrder, toStopOrder])
+  @@index([tripId, fromStopOrder, toStopOrder])
+  @@map("seat_segment_availability")
+}
+
+model Meal {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  price       Float
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  bookings    Booking[]
+
+  @@map("meals")
+}
+
+model LoyaltyTransaction {
+  id        String   @id @default(uuid())
+  userId    String
+  bookingId String?  @unique
+  points    Int
+  type      String
+  reason    String?
+  createdAt DateTime @default(now())
+  booking   Booking? @relation(fields: [bookingId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("loyalty_transactions")
+}
+
+model Payment {
+  id              String         @id @default(uuid())
+  bookingGroupId  String?        @unique
+  bookingId       String?        @unique // Keep for backward compatibility
+  amount          Float
+  method          String
+  status          String         @default("PENDING")
+  transactionId   String?        @unique
+  paidAt          DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  paymentDeadline DateTime?
+  bookingGroup    BookingGroup?  @relation(fields: [bookingGroupId], references: [id])
+  booking         Booking?       @relation(fields: [bookingId], references: [id])
+
+  @@map("payments")
+}
+
+model FreightOrder {
+  id                String           @id @default(uuid())
+  tripId            String
+  userId            String?
+  agentId           String?
+  trackingCode      String           @unique
+  senderName        String
+  senderPhone       String
+  receiverName      String
+  receiverPhone     String
+  weight            Float
+  type              String?
+  value             Float?
+  price             Float
+  status            String           @default("RECEIVED")
+  qrCode            String?
+  originStopId      String?
+  destinationStopId String?
+  busId             String?
+  notes             String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  agent             User?            @relation("AgentFreightSales", fields: [agentId], references: [id])
+  user              User?            @relation(fields: [userId], references: [id])
+  destinationStop   CityStop?        @relation("FreightDestinationStop", fields: [destinationStopId], references: [id])
+  originStop        CityStop?        @relation("FreightOriginStop", fields: [originStopId], references: [id])
+  bus               Bus?             @relation(fields: [busId], references: [id])
+  trip              Trip             @relation(fields: [tripId], references: [id])
+  payment           FreightPayment?
+  issues            LogisticsIssue[]
+
+  @@map("freight_orders")
+}
+
+model LogisticsIssue {
+  id             String       @id @default(uuid())
+  freightOrderId String
+  type           String
+  description    String
+  status         String       @default("OPEN")
+  reportedAt     DateTime     @default(now())
+  resolvedAt     DateTime?
+  notes          String?
+  freightOrder   FreightOrder @relation(fields: [freightOrderId], references: [id])
+
+  @@map("logistics_issues")
+}
+
+model FreightPayment {
+  id             String       @id @default(uuid())
+  freightOrderId String       @unique
+  amount         Float
+  method         String
+  status         String       @default("PENDING")
+  transactionId  String?      @unique
+  paidAt         DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  freightOrder   FreightOrder @relation(fields: [freightOrderId], references: [id])
+
+  @@map("freight_payments")
+}
+
+model Commission {
+  id             String    @id @default(uuid())
+  agentId        String
+  bookingId      String?
+  freightOrderId String?
+  amount         Float
+  percentage     Float
+  status         String    @default("PENDING")
+  paidAt         DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  agent          User      @relation(fields: [agentId], references: [id])
+
+  @@unique([agentId, bookingId])
+  @@map("commissions")
+}
+
+model Advertisement {
+  id           String   @id @default(uuid())
+  advertiserId String
+  title        String
+  description  String?
+  imageUrl     String
+  linkUrl      String?
+  type         String
+  status       String   @default("ACTIVE")
+  startDate    DateTime
+  endDate      DateTime
+  impressions  Int      @default(0)
+  clicks       Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  advertiser   User     @relation(fields: [advertiserId], references: [id])
+
+  @@map("advertisements")
+}
+
+model AdvertisementInquiry {
+  id               String    @id @default(uuid())
+  companyName      String
+  contactName      String
+  email            String
+  phone            String?
+  message          String?
+  desiredType      String
+  desiredStartDate DateTime?
+  desiredEndDate   DateTime?
+  imageUrl         String?
+  linkUrl          String?
+  status           String    @default("PENDING")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([status, createdAt])
+  @@map("advertisement_inquiries")
+}
+
+model Agency {
+  id        String   @id @default(uuid())
+  name      String
+  address   String
+  phone     String
+  email     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("agencies")
+}
+
+model Offer {
+  id            String   @id @default(uuid())
+  title         String
+  description   String?
+  code          String?  @unique
+  discountType  String
+  discountValue Float
+  startDate     DateTime
+  endDate       DateTime
+  isActive      Boolean  @default(true)
+  usageLimit    Int?
+  usedCount     Int      @default(0)
+  minAmount     Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("offers")
+}
+
+model BusRental {
+  id                String   @id @default(uuid())
+  userId            String
+  contactName       String
+  contactPhone      String
+  contactEmail      String
+  rentalType        String
+  startDate         DateTime
+  endDate           DateTime
+  startTime         String
+  endTime           String
+  departureLocation String
+  destination       String
+  stops             String?
+  estimatedDistance Int?
+  passengerCount    Int
+  preferredBusType  String?
+  specialRequests   String?
+  busId             String?
+  driverId          String?
+  basePrice         Float?
+  finalPrice        Float?
+  priceDetails      String?
+  status            String   @default("PENDING")
+  adminNotes        String?
+  rejectionReason   String?
+  paymentStatus     String   @default("UNPAID")
+  paymentMethod     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  driver            User?    @relation("RentalDriver", fields: [driverId], references: [id])
+  bus               Bus?     @relation(fields: [busId], references: [id])
+  user              User     @relation("RentalClient", fields: [userId], references: [id])
+
+  @@map("bus_rentals")
+}
+
+/// Bon de voyage : titre de transport ou avoir monétaire émis par l’admin, utilisable sur réservation.
+model TravelVoucher {
+  id                String    @id @default(uuid())
+  code              String    @unique
+  title             String?
+  beneficiaryName   String
+  beneficiaryPhone  String?
+  beneficiaryEmail  String?
+  userId            String?
+  valueAmount       Float
+  passengerCount    Int       @default(1)
+  status            String    @default("DRAFT")
+  validFrom         DateTime  @default(now())
+  validUntil        DateTime?
+  routeId           String?
+  tripId            String?
+  bookingId         String?   @unique
+  notes             String?
+  createdById       String?
+  issuedAt          DateTime?
+  redeemedAt        DateTime?
+  cancelledAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  user              User?     @relation(fields: [userId], references: [id])
+  route             Route?    @relation(fields: [routeId], references: [id])
+  trip              Trip?     @relation(fields: [tripId], references: [id])
+  booking           Booking?  @relation(fields: [bookingId], references: [id])
+  createdBy         User?     @relation("TravelVoucherCreatedBy", fields: [createdById], references: [id])
+
+  @@index([status])
+  @@index([validUntil])
+  @@map("travel_vouchers")
+}
+
+model CompanyReview {
+  id          String     @id @default(uuid())
+  userId      String
+  companyId   String
+  rating      Int
+  comment     String?
+  isVerified  Boolean    @default(false)
+  isVisible   Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  user        User       @relation(fields: [userId], references: [id])
+  company     BusCompany @relation(fields: [companyId], references: [id])
+
+  @@unique([userId, companyId])
+  @@index([companyId, rating])
+  @@map("company_reviews")
+}
+
+model NotificationCampaign {
+  id             String            @id @default(uuid())
+  title          String
+  message        String
+  channels       String
+  audience       String            @default("ALL_USERS")
+  status         String            @default("COMPLETED")
+  totalTargets   Int               @default(0)
+  totalSent      Int               @default(0)
+  totalFailed    Int               @default(0)
+  createdById    String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  createdBy      User?             @relation("NotificationCampaignCreatedBy", fields: [createdById], references: [id])
+  logs           NotificationLog[]
+
+  @@index([createdAt])
+  @@index([status])
+  @@map("notification_campaigns")
+}
+
+model NotificationLog {
+  id            String               @id @default(uuid())
+  campaignId    String?
+  userId        String?
+  channel       String
+  recipient     String?
+  title         String?
+  message       String
+  status        String               @default("PENDING")
+  errorMessage  String?
+  sentAt        DateTime?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  campaign      NotificationCampaign? @relation(fields: [campaignId], references: [id])
+  user          User?                @relation(fields: [userId], references: [id])
+
+  @@index([channel, status])
+  @@index([createdAt])
+  @@map("notification_logs")
+}
+
+model AppNotification {
+  id          String   @id @default(uuid())
+  userId      String
+  title       String
+  message     String
+  type        String   @default("INFO")
+  isRead      Boolean  @default(false)
+  readAt      DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+  @@map("app_notifications")
+}
+
+/// Plainte / ticket support client (assistance & réclamations)
+model SupportComplaint {
+  id              String    @id @default(uuid())
+  reference       String    @unique
+  userId          String?
+  category        String
+  subject         String
+  description     String
+  status          String    @default("OPEN")
+  priority        String    @default("NORMAL")
+  contactName     String
+  contactEmail    String
+  contactPhone    String?
+  bookingHint     String?
+  adminNotes      String?
+  resolvedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  user            User?     @relation(fields: [userId], references: [id])
+
+  @@index([status, createdAt])
+  @@index([userId])
+  @@map("support_complaints")
+}
