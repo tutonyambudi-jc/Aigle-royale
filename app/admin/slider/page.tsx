@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 
 export default function SliderAdminPage() {
-  const [slides, setSlides] = useState([]);
+  const [slides, setSlides] = useState<any[]>([]);
   const [newSlide, setNewSlide] = useState({ src: '', alt: '', caption: '' });
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function SliderAdminPage() {
     setNewSlide({ src: '', alt: '', caption: '' });
   }
 
-  async function handleDeleteSlide(id) {
+  async function handleDeleteSlide(id: any) {
     await fetch('/api/slider', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
