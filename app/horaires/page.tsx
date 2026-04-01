@@ -114,12 +114,12 @@ export default async function HorairesPage({
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="text-xs text-gray-500">{t.bus?.seatType === 'VIP' ? 'VIP' : 'Standard'}</div>
-                          {t.route.routeStops && t.route.routeStops.length > 0 && (
+                          {t.route.stops && t.route.stops.length > 0 && (
                             <span className="inline-flex items-center gap-1 text-xs font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded">
                               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                               </svg>
-                              {t.route.routeStops.length} arrêt{t.route.routeStops.length > 1 ? 's' : ''}
+                              {t.route.stops.length} arrêt{t.route.stops.length > 1 ? 's' : ''}
                             </span>
                           )}
                         </div>
