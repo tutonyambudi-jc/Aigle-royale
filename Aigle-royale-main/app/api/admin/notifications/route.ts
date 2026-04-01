@@ -46,9 +46,12 @@ export async function POST(request: Request) {
     const title = typeof body?.title === 'string' ? body.title.trim() : ''
     const message = typeof body?.message === 'string' ? body.message.trim() : ''
     const audience = body?.audience === 'ACTIVE_USERS' ? 'ACTIVE_USERS' : 'ALL_USERS'
-    const channels = Array.isArray(body?.channels) ? body.channels : []
+    const channels: unknown[] = Array.isArray(body?.channels) ? body.channels : []
     const allowed: NotificationChannel[] = ['SMS', 'WHATSAPP', 'EMAIL', 'APP']
-    const validChannels = channels.filter((channel: string): channel is NotificationChannel => allowed.includes(channel))
+    const validChannels = channels.filter(
+      (channel): channel is NotificationChannel =>
+        typeof channel === 'string' && allowed.includes(channel as NotificationChannel)
+    )
 
     if (!title || !message || validChannels.length === 0) {
       return NextResponse.json(

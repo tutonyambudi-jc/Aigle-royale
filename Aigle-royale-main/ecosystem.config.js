@@ -2,13 +2,13 @@ module.exports = {
   apps: [{
     name: 'aigle-royale',
     script: 'node_modules/next/dist/bin/next',
-    args: 'start',
+    args: 'start -p 3001',
     cwd: './',
-    instances: 2, // Utiliser 2 instances (cluster mode) - ajuster selon vos ressources
-    exec_mode: 'cluster',
+    instances: 1,
+    exec_mode: 'fork',
     env: {
       NODE_ENV: 'production',
-      PORT: 3000,
+      PORT: 3001,
     },
     error_file: './logs/pm2-error.log',
     out_file: './logs/pm2-out.log',

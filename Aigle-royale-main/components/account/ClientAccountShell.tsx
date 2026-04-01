@@ -20,12 +20,13 @@ import {
   Headphones,
   ExternalLink,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type NavItem = {
   href: string
   label: string
-  icon: React.ComponentType<{ className?: string; size?: number }>
+  icon: LucideIcon
   match: (pathname: string) => boolean
   cta?: boolean
 }

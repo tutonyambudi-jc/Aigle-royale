@@ -10,8 +10,9 @@ import { TicketList } from '@/components/TicketList'
 import { AdvertisementBanner } from '@/components/advertisements/AdvertisementBanner'
 
 // Helper function for currency formatting
-const formatCurrency = (amount: number, currency = 'XOF') => {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency }).format(amount)
+const formatCurrency = (amount: number, currency: 'FC' | 'USD' = 'FC') => {
+  const intlCurrency = currency === 'FC' ? 'XOF' : 'USD'
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: intlCurrency }).format(amount)
 }
 
 export default async function BookingGroupConfirmationPage({
@@ -63,7 +64,7 @@ export default async function BookingGroupConfirmationPage({
   )
 
   // Basic currency (could be dynamic based on trip)
-  const currency = 'XOF'
+  const currency: 'FC' | 'USD' = 'FC'
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

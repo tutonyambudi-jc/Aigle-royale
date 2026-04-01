@@ -2,11 +2,12 @@
 const ACTIVE_BOOKING_STATUSES = ['CONFIRMED', 'PENDING'] as const
 
 export function tripSeatsInfo(trip: {
-  bus: { capacity: number }
+  bus?: unknown
   _count?: { bookings: number }
 }): { remaining: number; capacity: number; occupied: number } | null {
   if (trip._count === undefined) return null
-  const capacity = Number(trip.bus?.capacity) || 0
+  const bus = trip.bus as { capacity?: number } | undefined
+  const capacity = Number(bus?.capacity) || 0
   const occupied = Math.min(trip._count.bookings, capacity)
   return {
     capacity,
