@@ -4,7 +4,7 @@ import { TicketCard } from './TicketCard'
 
 interface TicketListProps {
   bookings: any[]
-  currency: string
+  currency: 'FC' | 'USD'
 }
 
 export function TicketList({ bookings, currency }: TicketListProps) {
