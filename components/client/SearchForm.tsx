@@ -10,7 +10,7 @@ export function SearchForm() {
   const router = useRouter()
   const [origin, setOrigin] = useState('')
   const [destination, setDestination] = useState('')
-  const [tripType, setTripType] = useState<'one-way' | 'round-trip' | 'rental'>('one-way')
+  const [tripType, setTripType] = useState<string>('one-way')
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [returnDate, setReturnDate] = useState(format(new Date(Date.now() + 86400000), 'yyyy-MM-dd'))
   const [passengerCounts, setPassengerCounts] = useState({
