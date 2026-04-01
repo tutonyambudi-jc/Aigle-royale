@@ -1,8 +1,12 @@
 import { Navigation } from '@/components/layout/Navigation'
 import { prisma } from '@/lib/prisma'
 import { OperationalCitiesMap } from '@/components/maps/OperationalCitiesMap'
+import { cookies } from 'next/headers'
+
+export const dynamic = 'force-dynamic'
 
 export default async function CarteInteractivePage() {
+  await cookies()
   const cities = await prisma.city.findMany({
     where: { isActive: true },
     orderBy: { name: 'asc' },
