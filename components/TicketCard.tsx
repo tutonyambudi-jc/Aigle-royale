@@ -8,7 +8,7 @@ import { fr } from 'date-fns/locale'
 
 interface TicketCardProps {
   booking: any
-  currency: 'FC' | 'USD'
+  currency: string
   formatCurrency: (amount: number) => string
 }
 

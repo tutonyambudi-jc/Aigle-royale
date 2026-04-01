@@ -4,11 +4,11 @@ import { TicketCard } from './TicketCard'
 
 interface TicketListProps {
   bookings: any[]
-  currency: 'FC' | 'USD'
+  currency: string
 }
 
 export function TicketList({ bookings, currency }: TicketListProps) {
-  const formatCurrency = (amount: number, curr = 'XOF') => {
+  const formatCurrency = (amount: number, curr: string = 'XOF') => {
     return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: curr }).format(amount)
   }
 
