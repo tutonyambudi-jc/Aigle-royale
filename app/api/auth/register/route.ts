@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { hash } from 'bcryptjs'
+import crypto from 'crypto' // Explicit import for safety
 
 function makeReferralCode(): string {
   const random = Math.random().toString(36).substring(2, 8).toUpperCase()
@@ -66,7 +67,9 @@ export async function POST(request: Request) {
           })
           if (!exists) return code
         }
-        return `AR-${crypto.randomUUID().split('-')[0].toUpperCase()}`
+        // Safely use crypto.randomUUID
+        const uuid = typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : Math.random().toString(36).substring(2, 10)
+        return `AR-${uuid.split('-')[0].toUpperCase()}`
       })()
 
       const user = await tx.user.create({
@@ -105,10 +108,17 @@ export async function POST(request: Request) {
       { message: 'Compte créé avec succès', userId: created.userId },
       { status: 201 }
     )
-  } catch (error) {
-    console.error('Registration error:', error)
+  } catch (error: any) {
+    // Log the error more clearly in the console
+    console.error('[REGISTRATION_ERROR]', {
+      message: error.message,
+      name: error.name,
+      code: error.code,
+      meta: error.meta,
+      stack: error.stack
+    })
     return NextResponse.json(
-      { error: 'Une erreur est survenue lors de la création du compte' },
+      { error: 'Une erreur est survenue lors de la création du compte. ' + (process.env.NODE_ENV === 'development' ? error.message : '') },
       { status: 500 }
     )
   }
