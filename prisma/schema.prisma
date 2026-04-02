@@ -27,6 +27,7 @@ model User {
   updatedAt                   DateTime              @updatedAt
   birthDate                   DateTime?
   city                        String?
+  partnerCompanyId            String?
   fingerprintUrl              String?
   gender                      String?
   passportOrIdNumber          String?
@@ -45,6 +46,14 @@ model User {
   manifestShares              ManifestShare[]       @relation("ManifestShareCreatedBy")
   referredBy                  User?                 @relation("UserReferrals", fields: [referredById], references: [id])
   referrals                   User[]                @relation("UserReferrals")
+  travelVouchers              TravelVoucher[]
+  createdTravelVouchers       TravelVoucher[]       @relation("TravelVoucherCreatedBy")
+  companyReviews              CompanyReview[]
+  appNotifications            AppNotification[]
+  sentNotificationCampaigns   NotificationCampaign[] @relation("NotificationCampaignCreatedBy")
+  notificationLogs            NotificationLog[]
+  supportComplaints           SupportComplaint[]
+  partnerCompany              BusCompany?           @relation(fields: [partnerCompanyId], references: [id])
 
   @@map("users")
 }
@@ -143,6 +152,8 @@ model BusCompany {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   buses     Bus[]
+  reviews   CompanyReview[]
+  partnerAdmins User[]
 
   @@map("bus_companies")
 }
@@ -162,6 +173,7 @@ model Route {
   destinationCity   City?       @relation("RouteDestinationCity", fields: [destinationCityId], references: [id])
   originCity        City?       @relation("RouteOriginCity", fields: [originCityId], references: [id])
   trips             Trip[]
+  travelVouchers    TravelVoucher[]
 
   @@map("routes")
 }
@@ -188,6 +200,7 @@ model Trip {
   stopovers      TripStop[]
   route          Route          @relation(fields: [routeId], references: [id])
   bus            Bus            @relation(fields: [busId], references: [id])
+  travelVouchers TravelVoucher[]
 
   @@map("trips")
 }
@@ -352,6 +365,7 @@ model Booking {
   alightingStop            CityStop?           @relation("BookingAlightingStop", fields: [alightingStopId], references: [id])
   loyaltyTransaction       LoyaltyTransaction?
   payment                  Payment?
+  travelVoucher            TravelVoucher?
 
   @@map("bookings")
 }
@@ -604,4 +618,141 @@ model BusRental {
   user              User     @relation("RentalClient", fields: [userId], references: [id])
 
   @@map("bus_rentals")
+}
+
+/// Bon de voyage : titre de transport ou avoir monétaire émis par l’admin, utilisable sur réservation.
+model TravelVoucher {
+  id                String    @id @default(uuid())
+  code              String    @unique
+  title             String?
+  beneficiaryName   String
+  beneficiaryPhone  String?
+  beneficiaryEmail  String?
+  userId            String?
+  valueAmount       Float
+  passengerCount    Int       @default(1)
+  status            String    @default("DRAFT")
+  validFrom         DateTime  @default(now())
+  validUntil        DateTime?
+  routeId           String?
+  tripId            String?
+  bookingId         String?   @unique
+  notes             String?
+  createdById       String?
+  issuedAt          DateTime?
+  redeemedAt        DateTime?
+  cancelledAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  user              User?     @relation(fields: [userId], references: [id])
+  route             Route?    @relation(fields: [routeId], references: [id])
+  trip              Trip?     @relation(fields: [tripId], references: [id])
+  booking           Booking?  @relation(fields: [bookingId], references: [id])
+  createdBy         User?     @relation("TravelVoucherCreatedBy", fields: [createdById], references: [id])
+
+  @@index([status])
+  @@index([validUntil])
+  @@map("travel_vouchers")
+}
+
+model CompanyReview {
+  id          String     @id @default(uuid())
+  userId      String
+  companyId   String
+  rating      Int
+  comment     String?
+  isVerified  Boolean    @default(false)
+  isVisible   Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  user        User       @relation(fields: [userId], references: [id])
+  company     BusCompany @relation(fields: [companyId], references: [id])
+
+  @@unique([userId, companyId])
+  @@index([companyId, rating])
+  @@map("company_reviews")
+}
+
+model NotificationCampaign {
+  id             String            @id @default(uuid())
+  title          String
+  message        String
+  channels       String
+  audience       String            @default("ALL_USERS")
+  status         String            @default("COMPLETED")
+  totalTargets   Int               @default(0)
+  totalSent      Int               @default(0)
+  totalFailed    Int               @default(0)
+  createdById    String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  createdBy      User?             @relation("NotificationCampaignCreatedBy", fields: [createdById], references: [id])
+  logs           NotificationLog[]
+
+  @@index([createdAt])
+  @@index([status])
+  @@map("notification_campaigns")
+}
+
+model NotificationLog {
+  id            String               @id @default(uuid())
+  campaignId    String?
+  userId        String?
+  channel       String
+  recipient     String?
+  title         String?
+  message       String
+  status        String               @default("PENDING")
+  errorMessage  String?
+  sentAt        DateTime?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  campaign      NotificationCampaign? @relation(fields: [campaignId], references: [id])
+  user          User?                @relation(fields: [userId], references: [id])
+
+  @@index([channel, status])
+  @@index([createdAt])
+  @@map("notification_logs")
+}
+
+model AppNotification {
+  id          String   @id @default(uuid())
+  userId      String
+  title       String
+  message     String
+  type        String   @default("INFO")
+  isRead      Boolean  @default(false)
+  readAt      DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+  @@map("app_notifications")
+}
+
+/// Plainte / ticket support client (assistance & réclamations)
+model SupportComplaint {
+  id              String    @id @default(uuid())
+  reference       String    @unique
+  userId          String?
+  category        String
+  subject         String
+  description     String
+  status          String    @default("OPEN")
+  priority        String    @default("NORMAL")
+  contactName     String
+  contactEmail    String
+  contactPhone    String?
+  bookingHint     String?
+  adminNotes      String?
+  resolvedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  user            User?     @relation(fields: [userId], references: [id])
+
+  @@index([status, createdAt])
+  @@index([userId])
+  @@map("support_complaints")
 }

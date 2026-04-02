@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { resolveFreightPricePerKg } from '@/lib/freight-pricing'
 import { generateTrackingCode } from '@/lib/utils'
 import * as QRCode from 'qrcode'
 
@@ -44,9 +45,12 @@ export async function POST(request: Request) {
       )
     }
 
-    // Vérifier que le trajet existe
+    // Trajet + bus + compagnie (prix au kg propre à chaque compagnie)
     const trip = await prisma.trip.findUnique({
       where: { id: tripId },
+      include: {
+        bus: { include: { company: true } },
+      },
     })
 
     if (!trip || !trip.isActive) {
@@ -57,8 +61,7 @@ export async function POST(request: Request) {
       )
     }
 
-    // Calculer le prix (tarif premium: 10 000 FC par kg)
-    const pricePerKg = 10000
+    const pricePerKg = resolveFreightPricePerKg(trip.bus?.company ?? null)
     const priceValue = weightNum * pricePerKg
 
     // Générer le code de suivi

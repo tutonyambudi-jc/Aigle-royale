@@ -1,15 +1,33 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Package, Calculator, ArrowRight, Info, Building2 } from 'lucide-react'
 import { formatCurrency } from '@/lib/utils'
+import { DEFAULT_FREIGHT_PRICE_PER_KG_FC } from '@/lib/freight-pricing'
 
 export function FreightCalculator() {
     const [weight, setWeight] = useState<string>('')
-    const pricePerKg = 10000
+    const [minPerKg, setMinPerKg] = useState(DEFAULT_FREIGHT_PRICE_PER_KG_FC)
+    const [maxPerKg, setMaxPerKg] = useState(DEFAULT_FREIGHT_PRICE_PER_KG_FC)
+
+    useEffect(() => {
+        fetch('/api/freight/pricing-summary')
+            .then((r) => r.json())
+            .then((d) => {
+                if (typeof d?.min === 'number' && typeof d?.max === 'number') {
+                    setMinPerKg(d.min)
+                    setMaxPerKg(d.max)
+                }
+            })
+            .catch(() => {})
+    }, [])
 
     const numericWeight = parseFloat(weight)
-    const totalPrice = !isNaN(numericWeight) && numericWeight > 0 ? numericWeight * pricePerKg : 0
+    const totalMin =
+        !isNaN(numericWeight) && numericWeight > 0 ? numericWeight * minPerKg : 0
+    const totalMax =
+        !isNaN(numericWeight) && numericWeight > 0 ? numericWeight * maxPerKg : 0
+    const sameBand = minPerKg === maxPerKg
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -62,21 +80,44 @@ export function FreightCalculator() {
                             </div>
                         </div>
 
-                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-3">
-                            <Package className="text-slate-400" size={20} />
-                            <span className="text-sm font-bold text-slate-600">Tarif premium : {formatCurrency(pricePerKg)} / kg</span>
+                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-start gap-3">
+                            <Package className="text-slate-400 shrink-0 mt-0.5" size={20} />
+                            <span className="text-sm font-bold text-slate-600 leading-snug">
+                                {sameBand ? (
+                                    <>Tarif : {formatCurrency(minPerKg)} / kg</>
+                                ) : (
+                                    <>
+                                        Fourchette indicative : {formatCurrency(minPerKg)} – {formatCurrency(maxPerKg)}{' '}
+                                        / kg selon la compagnie du trajet
+                                    </>
+                                )}
+                            </span>
                         </div>
                     </div>
 
                     <div className="bg-slate-900 rounded-[2rem] p-10 text-white shadow-xl flex flex-col justify-center min-h-[300px] relative overflow-hidden group">
                         <div className="absolute inset-0 bg-gradient-to-br from-primary-600/20 to-transparent"></div>
 
-                        <p className="relative text-slate-400 font-bold text-xs uppercase tracking-[0.3em] mb-4">Prix Estimé</p>
-                        <div className="relative flex items-baseline gap-2 mb-8">
-                            <div className="text-6xl font-black tracking-tighter">
-                                {totalPrice.toLocaleString()}
-                            </div>
-                            <div className="text-2xl font-bold opacity-50 uppercase tracking-tighter">FC</div>
+                        <p className="relative text-slate-400 font-bold text-xs uppercase tracking-[0.3em] mb-4">
+                            {sameBand ? 'Prix estimé' : 'Fourchette estimée'}
+                        </p>
+                        <div className="relative flex flex-col gap-1 mb-8">
+                            {sameBand ? (
+                                <div className="flex items-baseline gap-2">
+                                    <div className="text-5xl sm:text-6xl font-black tracking-tighter">
+                                        {totalMin.toLocaleString()}
+                                    </div>
+                                    <div className="text-2xl font-bold opacity-50 uppercase tracking-tighter">FC</div>
+                                </div>
+                            ) : (
+                                <div className="space-y-1">
+                                    <div className="text-3xl sm:text-4xl font-black tracking-tight">
+                                        {totalMin.toLocaleString()} – {totalMax.toLocaleString()}{' '}
+                                        <span className="text-lg font-bold opacity-50">FC</span>
+                                    </div>
+                                    <p className="text-xs text-slate-500 font-medium">Le montant définitif dépend du trajet choisi</p>
+                                </div>
+                            )}
                         </div>
 
                         <div className="relative mt-auto space-y-4">

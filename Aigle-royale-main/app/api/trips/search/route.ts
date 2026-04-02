@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { normalizeSearchText } from '@/lib/search'
+import { resolveFreightPricePerKg } from '@/lib/freight-pricing'
 
 export async function GET(request: Request) {
   try {
@@ -34,7 +35,11 @@ export async function GET(request: Request) {
         },
       },
       include: {
-        bus: true,
+        bus: {
+          include: {
+            company: { select: { id: true, name: true, freightPricePerKg: true } },
+          },
+        },
         route: {
           include: {
             stops: {
@@ -66,6 +71,7 @@ export async function GET(request: Request) {
       return ro.includes(o) && rd.includes(d)
     }).map((t: any) => ({
       ...t,
+      freightPricePerKg: resolveFreightPricePerKg(t.bus?.company ?? null),
       stops: t.route?.stops?.map((rs: any) => ({
         id: rs.stop.id,
         name: rs.stop.name,

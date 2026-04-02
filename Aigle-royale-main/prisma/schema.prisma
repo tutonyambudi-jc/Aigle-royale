@@ -147,13 +147,15 @@ model DriverScheduleEvent {
 }
 
 model BusCompany {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  buses     Bus[]
-  reviews   CompanyReview[]
-  partnerAdmins User[]
+  id                 String   @id @default(uuid())
+  name               String   @unique
+  /// Prix du fret au kilogramme (FC), propre à chaque compagnie.
+  freightPricePerKg  Float    @default(10000)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  buses              Bus[]
+  reviews            CompanyReview[]
+  partnerAdmins      User[]
 
   @@map("bus_companies")
 }

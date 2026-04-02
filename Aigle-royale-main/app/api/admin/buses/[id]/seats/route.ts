@@ -54,6 +54,18 @@ export async function POST(
       return NextResponse.json({ error: 'Bus introuvable' }, { status: 404 })
     }
 
+    const bookingsOnBusSeats = await prisma.booking.count({
+      where: { seat: { busId: bus.id } },
+    })
+    if (bookingsOnBusSeats > 0) {
+      return NextResponse.json(
+        {
+          error: `Impossible de régénérer le plan de sièges : ${bookingsOnBusSeats} réservation(s) utilisent encore ce bus. Annulez ou traitez ces billets avant de modifier la disposition.`,
+        },
+        { status: 409 }
+      )
+    }
+
     // Siège chauffeur: présent dans le plan, mais PAS numéroté => pas de ligne `Seat` pour lui.
     const passengerSeatNumbers = buildSeatNumbers(rows, seatsPerRow)
     const passengerCapacity = passengerSeatNumbers.length
@@ -67,6 +79,18 @@ export async function POST(
     }
 
     await prisma.$transaction(async (tx) => {
+      const existingSeatIds = await tx.seat.findMany({
+        where: { busId: bus.id },
+        select: { id: true },
+      })
+      const ids = existingSeatIds.map((s) => s.id)
+      if (ids.length > 0) {
+        // Libère les FK avant suppression des sièges (disponibilité par segment de trajet)
+        await tx.seatSegmentAvailability.deleteMany({
+          where: { seatId: { in: ids } },
+        })
+      }
+
       // Remplacer toute la configuration des sièges passagers pour ce bus
       await tx.seat.deleteMany({ where: { busId: bus.id } })
 

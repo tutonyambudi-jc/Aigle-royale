@@ -15,7 +15,7 @@ export async function GET() {
 
     const companies = await prisma.busCompany.findMany({
       orderBy: { name: 'asc' },
-      select: { id: true, name: true },
+      select: { id: true, name: true, freightPricePerKg: true },
     })
 
     return NextResponse.json({ companies })

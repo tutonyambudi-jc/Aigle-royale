@@ -74,7 +74,7 @@ export default function AdminServiceFeesPage() {
           href="/admin/settings"
           className="px-4 py-2 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 font-semibold text-gray-800"
         >
-          Paramètres généraux
+          Retour aux paramètres
         </Link>
       </div>
 

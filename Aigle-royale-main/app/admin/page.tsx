@@ -4,6 +4,7 @@ import { getPaymentTimeRemaining, isPaymentUrgent } from '@/lib/booking-utils'
 import { getAdminDashboardAnalytics } from '@/lib/admin-dashboard-analytics'
 import { getAdminGlobalModuleOverview } from '@/lib/admin-global-overview'
 import { AdminGlobalOverview } from '@/components/admin/AdminGlobalOverview'
+import { AdminFillRatePanel } from '@/components/admin/AdminFillRatePanel'
 import Link from 'next/link'
 import { BookingActionButtons } from '@/components/admin/BookingActionButtons'
 import { cookies } from 'next/headers'
@@ -132,31 +133,21 @@ export default async function AdminDashboardPage() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6 mb-6">
-          <div className="lg:col-span-1 bg-gradient-to-br from-indigo-50 to-white rounded-xl shadow border border-indigo-100 p-6">
-            <div className="text-sm font-semibold text-indigo-900 mb-1">Taux de remplissage</div>
-            <p className="text-xs text-indigo-700/80 mb-4">
-              Trajets partis sur les 30 derniers jours : sièges vendus / capacité totale des bus.
-            </p>
-            <div className="flex items-end gap-2">
-              <span className="text-4xl font-black text-indigo-900">{analytics.fillRatePercent}</span>
-              <span className="text-xl font-bold text-indigo-600 mb-1">%</span>
-            </div>
-            <div className="mt-3 h-3 rounded-full bg-indigo-100 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-indigo-600 transition-all"
-                style={{ width: `${Math.min(100, analytics.fillRatePercent)}%` }}
-              />
-            </div>
-            <div className="mt-4 text-xs text-gray-600 space-y-1">
-              <div>
-                Sièges occupés : <strong>{analytics.totalOccupiedSeats}</strong> /{' '}
-                <strong>{analytics.totalCapacitySeats}</strong> places
-              </div>
-              <div>Trajets analysés : {analytics.fillTripCount}</div>
-            </div>
+          <div className="lg:col-span-2">
+            <div className="text-sm font-semibold text-gray-900 mb-2">Taux de remplissage</div>
+            <AdminFillRatePanel
+              fillRatePercent={analytics.fillRatePercent}
+              fillTripCount={analytics.fillTripCount}
+              totalCapacitySeats={analytics.totalCapacitySeats}
+              totalOccupiedSeats={analytics.totalOccupiedSeats}
+              fillRateGlobalGrowth={analytics.fillRateGlobalGrowth}
+              fillRateByCompany={analytics.fillRateByCompany}
+              fillRateByRoute={analytics.fillRateByRoute}
+              fillPeriod={analytics.fillPeriod}
+            />
           </div>
 
-          <div className="lg:col-span-2 bg-white rounded-xl shadow border border-gray-100 p-6">
+          <div className="lg:col-span-1 bg-white rounded-xl shadow border border-gray-100 p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-lg font-bold text-gray-900">Performance partenaires (compagnies)</h3>

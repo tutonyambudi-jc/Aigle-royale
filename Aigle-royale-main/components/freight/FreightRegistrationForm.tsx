@@ -2,14 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
+import { DEFAULT_FREIGHT_PRICE_PER_KG_FC } from '@/lib/freight-pricing'
 import { ParcelLabel } from './ParcelLabel'
 
 interface Trip {
   id: string
   departureTime: Date
   arrivalTime: Date
+  /** FC/kg — dérivé de la compagnie du bus (API recherche trajets) */
+  freightPricePerKg?: number
   bus: {
     name: string
+    company?: { name: string } | null
   }
   route: {
     origin: string
@@ -182,9 +186,12 @@ export function FreightRegistrationForm({ onSuccess }: FreightRegistrationFormPr
     },
   ]
 
+  const selectedTrip = trips.find((t) => t.id === formData.tripId)
+  const pricePerKg = selectedTrip?.freightPricePerKg ?? DEFAULT_FREIGHT_PRICE_PER_KG_FC
+
   const calculateTotalPrice = () => {
     const weight = parseFloat(formData.weight) || 0
-    return weight * 500 // Prix arbitraire pour l'exemple
+    return weight * pricePerKg
   }
 
   if (success && lastOrder) {
@@ -347,6 +354,9 @@ export function FreightRegistrationForm({ onSuccess }: FreightRegistrationFormPr
                               <div className="flex items-center gap-1.5">
                                 <div className="w-2 h-2 rounded-full bg-primary-500" />
                                 {trip.bus.name}
+                                {trip.bus.company?.name ? (
+                                  <span className="font-semibold text-gray-400">· {trip.bus.company.name}</span>
+                                ) : null}
                               </div>
                               <div className="flex items-center gap-1.5">
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -355,6 +365,11 @@ export function FreightRegistrationForm({ onSuccess }: FreightRegistrationFormPr
                                 {format(new Date(trip.departureTime), 'HH:mm')}
                               </div>
                             </div>
+                            {typeof trip.freightPricePerKg === 'number' && (
+                              <p className="text-xs font-bold text-amber-700 mt-2">
+                                Fret : {trip.freightPricePerKg.toLocaleString('fr-FR')} FC/kg
+                              </p>
+                            )}
                           </div>
                           {formData.tripId === trip.id && (
                             <div className="w-8 h-8 bg-primary-600 text-white rounded-full flex items-center justify-center animate-in zoom-in">

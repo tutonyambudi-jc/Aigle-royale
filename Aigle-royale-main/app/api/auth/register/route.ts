@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { hash } from 'bcryptjs'
+import { checkRateLimit, getRequestIp } from '@/lib/rate-limit'
+
+const REGISTER_WINDOW_MS = 15 * 60 * 1000
+const REGISTER_MAX_PER_WINDOW = 5
 
 function makeReferralCode(): string {
   const random = Math.random().toString(36).substring(2, 8).toUpperCase()
@@ -10,6 +14,20 @@ function makeReferralCode(): string {
 
 export async function POST(request: Request) {
   try {
+    const ip = getRequestIp(request)
+    const limited = checkRateLimit(`register:${ip}`, REGISTER_MAX_PER_WINDOW, REGISTER_WINDOW_MS)
+    if (!limited.ok) {
+      return NextResponse.json(
+        {
+          error: `Trop de tentatives d’inscription. Réessayez dans ${limited.retryAfterSec} s.`,
+        },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(limited.retryAfterSec) },
+        }
+      )
+    }
+
     const body = await request.json()
     const { firstName, lastName, email, phone, password, referralCode } = body
 

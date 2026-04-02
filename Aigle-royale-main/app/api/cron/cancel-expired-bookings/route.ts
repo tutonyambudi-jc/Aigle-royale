@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { shouldCancelBooking } from '@/lib/booking-utils'
+import { resolveCronSecret } from '@/lib/cron-secret'
 
 /**
  * Cron job endpoint to automatically cancel expired bookings
@@ -16,11 +17,13 @@ import { shouldCancelBooking } from '@/lib/booking-utils'
  */
 export async function GET(request: Request) {
     try {
-        // Verify cron secret to prevent unauthorized access
-        const authHeader = request.headers.get('authorization')
-        const cronSecret = process.env.CRON_SECRET || 'dev-secret'
+        const secret = resolveCronSecret()
+        if (!secret.ok) {
+            return NextResponse.json({ error: secret.message }, { status: secret.status })
+        }
 
-        if (authHeader !== `Bearer ${cronSecret}`) {
+        const authHeader = request.headers.get('authorization')
+        if (authHeader !== `Bearer ${secret.secret}`) {
             return NextResponse.json(
                 { error: 'Unauthorized' },
                 { status: 401 }

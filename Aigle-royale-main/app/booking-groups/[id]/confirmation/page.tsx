@@ -9,10 +9,18 @@ import Link from 'next/link'
 import { TicketList } from '@/components/TicketList'
 import { AdvertisementBanner } from '@/components/advertisements/AdvertisementBanner'
 
-// Helper function for currency formatting
 const formatCurrency = (amount: number, currency: 'FC' | 'USD' = 'FC') => {
   const intlCurrency = currency === 'FC' ? 'XOF' : 'USD'
   return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: intlCurrency }).format(amount)
+}
+
+/** Affichage propre des noms de villes (ex. kinshasa → Kinshasa) */
+function formatPlaceLabel(name: string) {
+  return name
+    .trim()
+    .split(/\s+/)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ')
 }
 
 export default async function BookingGroupConfirmationPage({
@@ -63,106 +71,133 @@ export default async function BookingGroupConfirmationPage({
     { subtotal: 0, serviceFee: 0 }
   )
 
-  // Basic currency (could be dynamic based on trip)
   const currency: 'FC' | 'USD' = 'FC'
 
+  const first = bookingGroup.bookings[0]
+  const origin = formatPlaceLabel(first.trip.route.origin)
+  const destination = formatPlaceLabel(first.trip.route.destination)
+  const departureDate = format(new Date(first.trip.departureTime), 'EEEE d MMMM yyyy', { locale: fr })
+  const departureTime = format(new Date(first.trip.departureTime), 'HH:mm', { locale: fr })
+
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto space-y-8">
-
-        {/* Header */}
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold text-blue-900 mb-2">Réservation Confirmée !</h1>
-          <p className="text-lg text-gray-600">
-            Votre voyage de <span className="font-semibold text-blue-700">{bookingGroup.bookings[0].trip.route.origin}</span> à <span className="font-semibold text-blue-700">{bookingGroup.bookings[0].trip.route.destination}</span> est prêt.
+    <div className="min-h-screen bg-[#f7f6f3] py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-2xl mx-auto space-y-8">
+        <header className="text-center border-b border-slate-200/80 pb-8">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500 mb-3">
+            Aigle Royale — Transport
           </p>
-        </div>
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full border border-slate-300 bg-white mb-4">
+            <svg className="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900 tracking-tight font-serif">
+            Confirmation de réservation
+          </h1>
+          <p className="mt-3 text-slate-600 text-base leading-relaxed max-w-md mx-auto">
+            Votre dossier a bien été enregistré. Itinéraire :{' '}
+            <span className="text-slate-900 font-medium">{origin}</span>
+            <span className="text-slate-400 mx-1.5" aria-hidden>
+              —
+            </span>
+            <span className="text-slate-900 font-medium">{destination}</span>.
+          </p>
+        </header>
 
-        {/* Trip Summary & Tickets */}
-        <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-          {/* Trip Summary Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="bg-white border border-slate-200 shadow-sm overflow-hidden">
+          <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/80">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
               <div>
-                <h2 className="text-2xl font-bold flex items-center gap-2">
-                  {bookingGroup.bookings[0].trip.route.origin}
-                  <span className="text-blue-300">➜</span>
-                  {bookingGroup.bookings[0].trip.route.destination}
-                </h2>
-                <div className="mt-2 flex flex-wrap gap-4 text-sm font-medium text-blue-100">
-                  <span className="flex items-center gap-1">
-                    📅 {format(new Date(bookingGroup.bookings[0].trip.departureTime), 'EEEE dd MMMM yyyy à HH:mm', { locale: fr })}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    🚌 {bookingGroup.bookings[0].trip.bus.name}
-                  </span>
-                </div>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Ligne</p>
+                <p className="text-lg font-medium text-slate-900">
+                  {origin} <span className="text-slate-400 font-normal">→</span> {destination}
+                </p>
+                <dl className="mt-4 space-y-2 text-sm text-slate-600">
+                  <div className="flex flex-wrap gap-x-6 gap-y-1">
+                    <dt className="text-slate-500 shrink-0">Date et heure de départ</dt>
+                    <dd className="font-medium text-slate-800">
+                      {departureDate}, {departureTime}
+                    </dd>
+                  </div>
+                  <div className="flex flex-wrap gap-x-6 gap-y-1">
+                    <dt className="text-slate-500 shrink-0">Véhicule</dt>
+                    <dd className="font-medium text-slate-800">{first.trip.bus.name}</dd>
+                  </div>
+                </dl>
               </div>
-              <div className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-bold border border-white/30">
-                {bookingGroup.bookings.length} Billet{bookingGroup.bookings.length > 1 ? 's' : ''}
+              <div className="sm:text-right">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Passagers</p>
+                <p className="text-lg font-medium tabular-nums text-slate-900">
+                  {bookingGroup.bookings.length} billet{bookingGroup.bookings.length > 1 ? 's' : ''}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Ticket List */}
-          <div className="p-6 bg-gray-50/50">
+          <div className="p-6 bg-[#fafaf8] border-b border-slate-100">
             <TicketList bookings={bookingGroup.bookings} currency={currency} />
           </div>
 
-          {/* Total & Status Footer */}
-          <div className="bg-white p-6 border-t border-gray-100">
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="px-6 py-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-6">
               <div>
-                <div className="text-sm text-gray-500 uppercase tracking-wide font-semibold">Montant Total</div>
-                <div className="text-3xl font-black text-blue-900">{formatCurrency(bookingGroup.totalAmount, currency)}</div>
-                <div className="text-xs text-gray-500 mt-2">
-                  Sous-total: <span className="font-semibold text-gray-700">{formatCurrency(totals.subtotal, currency)}</span>
-                </div>
-                <div className="text-xs text-gray-500">
-                  Frais de service: <span className="font-semibold text-gray-700">{formatCurrency(totals.serviceFee, currency)}</span>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Montant total</p>
+                <p className="text-2xl font-semibold text-slate-900 tabular-nums mt-1">
+                  {formatCurrency(bookingGroup.totalAmount, currency)}
+                </p>
+                <div className="mt-3 text-xs text-slate-500 space-y-0.5">
+                  <p>
+                    Sous-total :{' '}
+                    <span className="text-slate-700 tabular-nums">{formatCurrency(totals.subtotal, currency)}</span>
+                  </p>
+                  <p>
+                    Frais de service :{' '}
+                    <span className="text-slate-700 tabular-nums">{formatCurrency(totals.serviceFee, currency)}</span>
+                  </p>
                 </div>
               </div>
 
               {isPaid ? (
-                <div className="flex items-center gap-3 px-5 py-3 bg-green-50 border border-green-200 rounded-xl text-green-700">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <div className="flex items-start gap-3 px-4 py-3 border border-slate-200 bg-white max-w-xs">
+                  <svg className="w-5 h-5 text-slate-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
                   <div>
-                    <div className="font-bold">Paiement confirmé</div>
+                    <p className="text-sm font-semibold text-slate-900">Paiement enregistré</p>
                     {bookingGroup.payment?.paidAt && (
-                      <div className="text-xs opacity-75">Le {format(new Date(bookingGroup.payment.paidAt), 'dd/MM/yyyy à HH:mm')}</div>
+                      <p className="text-xs text-slate-500 mt-0.5">
+                        {format(new Date(bookingGroup.payment.paidAt), "d MMMM yyyy 'à' HH:mm", { locale: fr })}
+                      </p>
                     )}
                   </div>
                 </div>
               ) : (
-                <div className="px-5 py-3 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-800 font-bold">
-                  En attente de paiement
+                <div className="px-4 py-3 border border-amber-200/80 bg-amber-50/50 text-sm text-amber-950 max-w-xs">
+                  <p className="font-semibold">Paiement en attente</p>
+                  <p className="text-xs text-amber-900/80 mt-1">Finalisez le règlement pour confirmer définitivement votre dossier.</p>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Advertisement */}
         <AdvertisementBanner type="BANNER_CONFIRMATION" />
 
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+        <div className="flex flex-col sm:flex-row justify-center gap-3 pt-2">
           <Link
             href="/dashboard"
-            className="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors text-center shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            className="inline-flex justify-center items-center px-6 py-2.5 bg-slate-900 text-white text-sm font-medium hover:bg-slate-800 transition-colors border border-slate-900"
           >
-            Voir mes réservations
+            Mes réservations
           </Link>
           <Link
             href="/"
-            className="px-8 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-colors text-center hover:border-gray-300"
+            className="inline-flex justify-center items-center px-6 py-2.5 bg-white text-slate-800 text-sm font-medium border border-slate-300 hover:bg-slate-50 transition-colors"
           >
             Nouvelle recherche
           </Link>
         </div>
-
       </div>
     </div>
   )
 }
-// Force refresh

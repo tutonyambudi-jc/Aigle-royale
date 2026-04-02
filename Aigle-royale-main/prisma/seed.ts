@@ -346,6 +346,13 @@ async function main() {
       })
     }
   }
+  // SQLite: supprimer les lignes qui référencent les sièges avant deleteMany(seats)
+  const seatIds1 = await prisma.seat.findMany({ where: { busId: bus1.id }, select: { id: true } })
+  if (seatIds1.length > 0) {
+    await prisma.seatSegmentAvailability.deleteMany({
+      where: { seatId: { in: seatIds1.map((s) => s.id) } },
+    })
+  }
   // SQLite: `skipDuplicates` n'est pas supporté sur createMany
   await prisma.seat.deleteMany({ where: { busId: bus1.id } })
   await prisma.seat.createMany({
@@ -364,6 +371,12 @@ async function main() {
         isAvailable: true,
       })
     }
+  }
+  const seatIds2 = await prisma.seat.findMany({ where: { busId: bus2.id }, select: { id: true } })
+  if (seatIds2.length > 0) {
+    await prisma.seatSegmentAvailability.deleteMany({
+      where: { seatId: { in: seatIds2.map((s) => s.id) } },
+    })
   }
   await prisma.seat.deleteMany({ where: { busId: bus2.id } })
   await prisma.seat.createMany({

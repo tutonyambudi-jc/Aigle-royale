@@ -5,6 +5,18 @@ import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
+/**
+ * Chemins pour lesquels l’entrée « Paramètres » reste mise en avant :
+ * hub, pages retirées du menu, et écrans de config accessibles depuis le hub (sans dupliquer les entrées métier type « Tarifs passagers »).
+ */
+const SETTINGS_HIGHLIGHT_PATHS = [
+    '/admin/settings',
+    '/admin/service-fees',
+    '/admin/notifications/brevo',
+    '/admin/support/settings',
+    '/admin/commissions/settings',
+] as const
+
 const MENU_ITEMS = [
     {
         title: 'Tableau de bord',
@@ -14,6 +26,21 @@ const MENU_ITEMS = [
             </svg>
         ),
         href: '/admin',
+    },
+    {
+        title: 'Paramètres',
+        icon: (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+        ),
+        href: '/admin/settings',
     },
     {
         title: 'Réservations',
@@ -97,15 +124,6 @@ const MENU_ITEMS = [
         href: '/admin/travel-vouchers',
     },
     {
-        title: 'Frais de service',
-        icon: (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        ),
-        href: '/admin/service-fees',
-    },
-    {
         title: 'Notifications',
         icon: (
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,16 +140,6 @@ const MENU_ITEMS = [
             </svg>
         ),
         href: '/admin/notifications/dashboard',
-    },
-    {
-        title: 'Config. Brevo',
-        icon: (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-        ),
-        href: '/admin/notifications/brevo',
     },
     {
         title: 'Support client',
@@ -222,6 +230,9 @@ export function AdminSidebar() {
     const [isOpen, setIsOpen] = useState(false)
 
     const isActive = (href: string) => {
+        if (href === '/admin/settings') {
+            return SETTINGS_HIGHLIGHT_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))
+        }
         if (href === '/admin') return pathname === '/admin'
         return pathname.startsWith(href)
     }
