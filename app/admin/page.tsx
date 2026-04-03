@@ -1,6 +1,10 @@
 import { prisma } from '@/lib/prisma'
 import { formatCurrency, type DisplayCurrency } from '@/lib/utils'
 import { getPaymentTimeRemaining, isPaymentUrgent } from '@/lib/booking-utils'
+import { getAdminDashboardAnalytics } from '@/lib/admin-dashboard-analytics'
+import { getAdminGlobalModuleOverview } from '@/lib/admin-global-overview'
+import { AdminGlobalOverview } from '@/components/admin/AdminGlobalOverview'
+import { AdminFillRatePanel } from '@/components/admin/AdminFillRatePanel'
 import Link from 'next/link'
 import { BookingActionButtons } from '@/components/admin/BookingActionButtons'
 import { cookies } from 'next/headers'
@@ -55,7 +59,11 @@ export default async function AdminDashboardPage() {
   const session = await getServerSession(authOptions)
   const cookieStore = await cookies()
   const currency: DisplayCurrency = cookieStore.get('ar_currency')?.value === 'USD' ? 'USD' : 'FC'
-  const stats = await getAdminStats()
+  const [stats, analytics, globalOverview] = await Promise.all([
+    getAdminStats(),
+    getAdminDashboardAnalytics(),
+    getAdminGlobalModuleOverview(),
+  ])
 
   return (
     <>
@@ -89,6 +97,98 @@ export default async function AdminDashboardPage() {
         <div className="bg-white rounded-lg shadow-md p-6">
           <div className="text-sm text-gray-600 mb-1">Trajets actifs</div>
           <div className="text-3xl font-bold text-gray-900">{stats.totalTrips}</div>
+        </div>
+      </div>
+
+      <AdminGlobalOverview overview={globalOverview} />
+
+      {/* Statistiques ventes, revenus, remplissage, partenaires */}
+      <div className="mb-8">
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Indicateurs de performance</h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white rounded-lg shadow border border-gray-100 p-5">
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Ventes (7 j.)</div>
+            <div className="text-2xl font-bold text-gray-900 mt-1">{analytics.salesLast7d}</div>
+            <div className="text-xs text-gray-500 mt-1">Billets confirmés</div>
+          </div>
+          <div className="bg-white rounded-lg shadow border border-gray-100 p-5">
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Ventes (30 j.)</div>
+            <div className="text-2xl font-bold text-gray-900 mt-1">{analytics.salesLast30d}</div>
+            <div className="text-xs text-gray-500 mt-1">Billets confirmés</div>
+          </div>
+          <div className="bg-white rounded-lg shadow border border-gray-100 p-5">
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Revenus (7 j.)</div>
+            <div className="text-2xl font-bold text-emerald-700 mt-1">
+              {formatCurrency(analytics.revenueLast7d, currency)}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">Paiements encaissés</div>
+          </div>
+          <div className="bg-white rounded-lg shadow border border-gray-100 p-5">
+            <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Revenus (30 j.)</div>
+            <div className="text-2xl font-bold text-emerald-700 mt-1">
+              {formatCurrency(analytics.revenueLast30d, currency)}
+            </div>
+            <div className="text-xs text-gray-500 mt-1">Paiements encaissés</div>
+          </div>
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-6 mb-6">
+          <div className="lg:col-span-2">
+            <div className="text-sm font-semibold text-gray-900 mb-2">Taux de remplissage</div>
+            <AdminFillRatePanel
+              fillRatePercent={analytics.fillRatePercent}
+              fillTripCount={analytics.fillTripCount}
+              totalCapacitySeats={analytics.totalCapacitySeats}
+              totalOccupiedSeats={analytics.totalOccupiedSeats}
+              fillRateGlobalGrowth={analytics.fillRateGlobalGrowth}
+              fillRateByCompany={analytics.fillRateByCompany}
+              fillRateByRoute={analytics.fillRateByRoute}
+              fillPeriod={analytics.fillPeriod}
+            />
+          </div>
+
+          <div className="lg:col-span-1 bg-white rounded-xl shadow border border-gray-100 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Performance partenaires (compagnies)</h3>
+                <p className="text-xs text-gray-500">
+                  Top compagnies sur 30 j. — CA issu des billets payés (par bus affecté).
+                </p>
+              </div>
+              <Link
+                href="/companies/ranking"
+                className="text-xs font-semibold text-primary-600 hover:underline"
+              >
+                Classement public →
+              </Link>
+            </div>
+            {analytics.partners.length === 0 ? (
+              <p className="text-sm text-gray-500 py-6 text-center">Aucune donnée compagnie sur cette période.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-200 text-left text-gray-500">
+                      <th className="pb-2 pr-4">Compagnie</th>
+                      <th className="pb-2 pr-4">Billets payés</th>
+                      <th className="pb-2">Chiffre d’affaires (30 j.)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {analytics.partners.map((p, i) => (
+                      <tr key={p.companyId || `row-${i}`} className="border-b border-gray-50 last:border-0">
+                        <td className="py-2.5 pr-4 font-medium text-gray-900">{p.name}</td>
+                        <td className="py-2.5 pr-4 text-gray-700">{p.bookingsCount}</td>
+                        <td className="py-2.5 font-semibold text-emerald-700">
+                          {formatCurrency(p.revenue, currency)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -197,6 +297,18 @@ export default async function AdminDashboardPage() {
             <Link href="/admin/city-stops" className="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 bg-blue-50">
               <div className="font-semibold text-gray-900">📍 Arrêts de ville</div>
               <div className="text-sm text-gray-600">Gérer les gares et arrêts</div>
+            </Link>
+            <Link href="/admin/notifications" className="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+              <div className="font-semibold text-gray-900">Module notifications</div>
+              <div className="text-sm text-gray-600">Envoyer SMS, WhatsApp, Email et in-app</div>
+            </Link>
+            <Link href="/admin/notifications/dashboard" className="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+              <div className="font-semibold text-gray-900">Dashboard notifications</div>
+              <div className="text-sm text-gray-600">Suivi des envois et statistiques</div>
+            </Link>
+            <Link href="/admin/support" className="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
+              <div className="font-semibold text-gray-900">Support client</div>
+              <div className="text-sm text-gray-600">Plaintes, réclamations et paramètres WhatsApp</div>
             </Link>
           </div>
         </div>

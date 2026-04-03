@@ -1,0 +1,41 @@
+[33mcommit 2b0f634a3a20987381f4f93a3b44763b786bd743[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: tutonyambudi <tutonyambudi@gmail.com>
+Date:   Thu Apr 2 22:55:38 2026 +0100
+
+    mise à jour des nouvelles fonctionalité
+
+Aigle-royale-main/app/admin/bookings/page.tsx
+Aigle-royale-main/app/admin/page.tsx
+Aigle-royale-main/app/admin/service-fees/page.tsx
+Aigle-royale-main/app/admin/settings/page.tsx
+Aigle-royale-main/app/api/admin/analytics/fill-rate/route.ts
+Aigle-royale-main/app/api/admin/buses/[id]/seats/route.ts
+Aigle-royale-main/app/api/admin/companies/[id]/route.ts
+Aigle-royale-main/app/api/admin/companies/route.ts
+Aigle-royale-main/app/api/auth/register/route.ts
+Aigle-royale-main/app/api/cron/cancel-expired-bookings/route.ts
+Aigle-royale-main/app/api/freight/pricing-summary/route.ts
+Aigle-royale-main/app/api/freight/route.ts
+Aigle-royale-main/app/api/trips/search/route.ts
+Aigle-royale-main/app/api/upload/route.ts
+Aigle-royale-main/app/booking-groups/[id]/confirmation/page.tsx
+Aigle-royale-main/components/admin/AdminBookingsFilters.tsx
+Aigle-royale-main/components/admin/AdminFillRatePanel.tsx
+Aigle-royale-main/components/admin/AdminSettingsHub.tsx
+Aigle-royale-main/components/admin/AdminSidebar.tsx
+Aigle-royale-main/components/admin/FreightCompanyPricingForm.tsx
+Aigle-royale-main/components/admin/SystemBookingSettingsForm.tsx
+Aigle-royale-main/components/freight/FreightCalculator.tsx
+Aigle-royale-main/components/freight/FreightRegistrationForm.tsx
+Aigle-royale-main/env.example
+Aigle-royale-main/lib/admin-dashboard-analytics.ts
+Aigle-royale-main/lib/cron-secret.ts
+Aigle-royale-main/lib/freight-pricing.ts
+Aigle-royale-main/lib/rate-limit.ts
+Aigle-royale-main/lib/upload-validate.ts
+Aigle-royale-main/next.config.js
+Aigle-royale-main/prisma/prisma/dev.db
+Aigle-royale-main/prisma/schema.prisma
+Aigle-royale-main/prisma/seed.ts
+prisma/schema.prisma
+tsconfig.json
